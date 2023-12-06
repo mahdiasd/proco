@@ -10,7 +10,7 @@ import com.proco.domain.model.user.UserType
 import kotlinx.collections.immutable.ImmutableList
 
 @Stable
-    data class RegisterParam(
+data class RegisterParam(
     val name: String = "",
     val family: String = "",
     val email: String = "",
@@ -24,4 +24,4 @@ import kotlinx.collections.immutable.ImmutableList
     val bio: String = "",
     val country: Country? = null,
     val userType: UserType = UserType.Mentee
-    )
+)

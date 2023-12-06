@@ -5,8 +5,8 @@ import java.io.File
 
 object MyConstant {
 
-    private const val Domain = "192.168.51.157"
-    const val BaseUrl = "http://$Domain:8080/"
+    private const val Domain = "api.procoapp.com"
+    const val BaseUrl = "https://$Domain/"
 
     var ConnectionTimeOut = 25L
     var ReadTimeOut = 25L

@@ -15,19 +15,19 @@ class UserRepositoryImpl @Inject constructor(
 ) : UserRepository {
 
     override suspend fun login(email: String, password: String): Flow<DataResult<User>> = flow {
-        safeCall { apiService.login(email, password) }
+        emit(safeCall { apiService.login(email, password) })
     }
 
-    override suspend fun getUsers(search: String?, jobTitle: String?, country: String?, page: Int) = flow<DataResult<List<User>>> {
-        safeCall { apiService.getUsers(search, jobTitle, country, page) }
+    override suspend fun getUsers(search: String?, jobTitle: String?, country: String?, page: Int) = flow {
+        emit(safeCall { apiService.getUsers(search, jobTitle, country, page) })
     }
 
-    override suspend fun getUser(id: Int) = flow<DataResult<User>> {
-        safeCall { apiService.getUser(id) }
+    override suspend fun getUser(id: Int) = flow {
+        emit(safeCall { apiService.getUser(id) })
     }
 
-    override suspend fun register(registerParam: RegisterParam) = flow<DataResult<User>> {
-        safeCall { apiService.register(registerParam) }
+    override suspend fun register(registerParam: RegisterParam) = flow {
+        emit(safeCall { apiService.register(registerParam) })
     }
 
 

@@ -1,12 +1,11 @@
 package com.proco.data.remote.api
 
+import com.proco.domain.model.network.NetworkResponse
 import com.proco.domain.model.schedule.ScheduleDto
 import com.proco.domain.model.user.Country
 import com.proco.domain.model.user.Job
 import com.proco.domain.model.user.User
 import com.proco.domain.usecase.auth.RegisterParam
-import kotlinx.collections.immutable.ImmutableList
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -15,12 +14,12 @@ import retrofit2.http.POST
 
 interface ApiService {
 
-    @POST
+    @POST("/auth/login")
     @FormUrlEncoded
-    suspend fun login(@Field("email") email: String, @Field("password") password: String): Response<User>
+    suspend fun login(@Field("email") email: String, @Field("password") password: String): NetworkResponse<User>
 
     @POST
-    suspend fun saveSchedule(@Body scheduleDto: List<ScheduleDto>): Response<Boolean>
+    suspend fun saveSchedule(@Body scheduleDto: List<ScheduleDto>): NetworkResponse<Boolean>
 
     @POST
     @FormUrlEncoded
@@ -29,20 +28,20 @@ interface ApiService {
         @Field("job_title") jobTitle: String? = null,
         @Field("country") country: String? = null,
         @Field("page") page: Int? = null,
-    ): Response<List<User>>
+    ): NetworkResponse<List<User>>
 
     @POST
     @FormUrlEncoded
     suspend fun getUser(
         @Field("id") id: Int,
-    ): Response<User>
+    ): NetworkResponse<User>
 
-    @POST
-    suspend fun register(@Body registerParam: RegisterParam): Response<User>
+    @POST("/auth/register")
+    suspend fun register(@Body registerParam: RegisterParam): NetworkResponse<User>
 
-    @GET
-    suspend fun getCountries(): Response<ImmutableList<Country>>
+    @GET("/country")
+    suspend fun getCountries(): NetworkResponse<List<Country>>
 
-    @GET
-    suspend fun getJobs(): Response<ImmutableList<Job>>
+    @GET("/job")
+    suspend fun getJobs(): NetworkResponse<List<Job>>
 }

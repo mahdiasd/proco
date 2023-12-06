@@ -7,9 +7,10 @@ import com.proco.domain.model.network.getUiMessage
 import com.proco.domain.usecase.auth.RegisterUseCase
 import com.proco.domain.usecase.country.GetCountriesUseCase
 import com.proco.domain.usecase.job.GetJobsUseCase
+import com.proco.extention.dLog
 import com.proco.extention.isNull
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.retry
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -40,10 +41,12 @@ class RegisterViewModel @Inject constructor(
     private fun getCountries() {
         viewModelScope.launch {
             setState { currentState.copy(isLoading = true) }
-            getCountriesUseCase.executeSync(Unit).retry(3).collect {
+            getCountriesUseCase.executeSync(Unit).collect {
                 when (it) {
                     is DataResult.Failure -> setEffect { RegisterUiEffect.ErrorMessage(it.errorEntity.getUiMessage()) }
-                    is DataResult.Success -> setState { copy(allCountries = it.data) }
+                    is DataResult.Success -> {
+                        setState { copy(allCountries = it.data.toImmutableList()) }
+                    }
                 }
             }
         }
@@ -52,10 +55,13 @@ class RegisterViewModel @Inject constructor(
     private fun getJobs() {
         viewModelScope.launch {
             setState { currentState.copy(isLoading = true) }
-            getJobsUseCase.executeSync(Unit).retry(3).collect {
+            getJobsUseCase.executeSync(Unit).collect {
                 when (it) {
-                    is DataResult.Failure -> setEffect { RegisterUiEffect.ErrorMessage(it.errorEntity.getUiMessage()) }
-                    is DataResult.Success -> setState { copy(allJobs = it.data) }
+                    is DataResult.Failure -> {
+                        setEffect { RegisterUiEffect.ErrorMessage(it.errorEntity.getUiMessage()) }
+                    }
+
+                    is DataResult.Success -> setState { copy(allJobs = it.data.toImmutableList()) }
                 }
             }
         }
@@ -84,8 +90,12 @@ class RegisterViewModel @Inject constructor(
             }
 
             currentState.data.job.isNull() -> {
-                setEffect { RegisterUiEffect.EmptyJobTitle }
-                false
+                if (currentState.currentStep == 1) {
+                    setEffect { RegisterUiEffect.EmptyJobTitle }
+                    false
+                } else {
+                    true
+                }
             }
 
             else -> return true
@@ -99,7 +109,7 @@ class RegisterViewModel @Inject constructor(
             RegisterTypingType.Name -> setState { currentState.copy(data = data.copy(name = text)) }
             RegisterTypingType.Password -> setState { currentState.copy(data = data.copy(password = text)) }
             RegisterTypingType.Company -> setState { currentState.copy(data = data.copy(company = text)) }
-            RegisterTypingType.Bio -> setState { currentState.copy(data = data.copy(company = text)) }
+            RegisterTypingType.Bio -> setState { currentState.copy(data = data.copy(bio = text)) }
             RegisterTypingType.Skill -> {}
         }
     }
@@ -109,6 +119,7 @@ class RegisterViewModel @Inject constructor(
     override fun onTriggerEvent(event: RegisterUiEvent) {
         when (event) {
             is RegisterUiEvent.OnNextStep -> {
+                event.index.dLog()
                 if (event.index == 3 && validate()) {
                     register()
                 } else if ((event.index < currentState.currentStep) || validate())
@@ -120,7 +131,7 @@ class RegisterViewModel @Inject constructor(
             is RegisterUiEvent.OnUserType -> setState { currentState.copy(data = data.copy(userType = event.userType)) }
             is RegisterUiEvent.OnGender -> setState { currentState.copy(data = data.copy(gender = event.gender)) }
             is RegisterUiEvent.OnCountry -> setState { currentState.copy(data = data.copy(country = event.country)) }
-            is RegisterUiEvent.OnExperience -> setState { currentState.copy(data = data.copy(experience = event.experience)) }
+            is RegisterUiEvent.OnExperience -> setState { currentState.copy(data = data.copy(experience = event.experience.index)) }
             is RegisterUiEvent.OnExpertise -> setState { currentState.copy(data = data.copy(expertise = event.expertise)) }
             is RegisterUiEvent.OnJobTitle -> setState { currentState.copy(data = data.copy(job = event.job)) }
         }

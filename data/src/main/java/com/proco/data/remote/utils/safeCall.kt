@@ -3,22 +3,24 @@ package com.proco.data.remote.utils
 import com.proco.domain.model.network.DataResult
 import com.proco.domain.model.network.ErrorEntity
 import com.proco.domain.model.network.NetworkResponse
+import com.proco.extention.eLog
 import kotlinx.serialization.json.Json
 import retrofit2.HttpException
-import retrofit2.Response
 import java.io.IOException
 import java.net.HttpURLConnection
 
 
-suspend fun <T : Any> safeCall(execute: suspend () -> Response<T>): DataResult<T> {
+suspend fun <T : Any> safeCall(execute: suspend () -> NetworkResponse<T>): DataResult<T> {
     return try {
         val response = execute()
-        if (response.isSuccessful && response.body() != null) {
-            DataResult.Success(response.body()!!)
+        if (response.status == "success" && response.data != null) {
+            DataResult.Success(response.data!!)
         } else {
-            DataResult.Failure(ErrorEntity.Unknown(""))
+            "${response.getsMessage()} ".eLog(tag = "Retrofit", plusTag = "safeCall is not successful")
+            DataResult.Failure(ErrorEntity.Unknown)
         }
     } catch (e: Throwable) {
+        "${e.message} ".eLog(tag = "Retrofit", plusTag = "safeCall exception")
         DataResult.Failure(getError(e))
     }
 }
@@ -26,9 +28,10 @@ suspend fun <T : Any> safeCall(execute: suspend () -> Response<T>): DataResult<T
 fun getError(throwable: Throwable): ErrorEntity {
     return when (throwable) {
         is IOException -> ErrorEntity.IoException
+        is IllegalArgumentException -> ErrorEntity.IllegalArgumentException
         is HttpException -> {
             val errorBody: String = throwable.response()?.errorBody()?.string() ?: ""
-            val message = Json.decodeFromString<NetworkResponse?>(errorBody)?.getMessage() ?: ""
+            val message = Json.decodeFromString<NetworkResponse<*>?>(errorBody)?.getsMessage() ?: ""
 
             when (throwable.code()) {
                 // unauthorized
@@ -44,11 +47,11 @@ fun getError(throwable: Throwable): ErrorEntity {
                 HttpURLConnection.HTTP_SERVER_ERROR -> ErrorEntity.ServerUnavailable
 
                 // all the others will be treated as unknown error
-                else -> ErrorEntity.Unknown(message)
+                else -> ErrorEntity.Unknown
             }
         }
 
-        else -> ErrorEntity.Unknown(throwable.message.toString())
+        else -> ErrorEntity.Unknown
     }
 }
 
