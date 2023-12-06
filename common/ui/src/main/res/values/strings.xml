@@ -1,0 +1,62 @@
+<resources>
+    <string name="app_name">Proco</string>
+
+    <string name="home">Home</string>
+
+    <string name="search">Search</string>
+    <string name="profile">Profile</string>
+    <string name="invoice">Invoice</string>
+    <string name="booking">Booking</string>
+    <string name="schedule">Schedule</string>
+
+    <string name="day_of_week">Day of week</string>
+    <string name="hours_of_day">Hours of day</string>
+
+    <string name="see_all">See All</string>
+    <string name="save">Save</string>
+    <string name="filter">Filter</string>
+
+    <string name="rational_permissions">"Why Permission "</string>
+    <string name="got_it">Goccha</string>
+    <string name="try_again">Try Again</string>
+    <string name="no_information_for_show">No information exist.</string>
+    <string name="login_here">Login here</string>
+    <string name="login_text">Your Proco adventure awaits\nlog in to get started!</string>
+    <string name="login">Login</string>
+    <string name="create_new_account">Create new account</string>
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="name">Name</string>
+    <string name="family">Family</string>
+    <string name="skills">Skills</string>
+    <string name="bio">Bio</string>
+    <string name="empty_bio">Bio is not written by Mentor.</string>
+    <string name="next_step">Next step</string>
+    <string name="empty_name">Please fill name field</string>
+    <string name="empty_family">Please fill family field</string>
+    <string name="empty_job_title">Please fill job-title field</string>
+    <string name="empty_email">Please fill email field</string>
+    <string name="empty_password">Please fill password field</string>
+    <string name="mentee">Mentee</string>
+    <string name="mentor">Mentor</string>
+    <string name="gender">Gender</string>
+    <string name="female">Female</string>
+    <string name="male">Male</string>
+    <string name="non_binary">Non-binary</string>
+    <string name="country">Country</string>
+    <string name="your_experience">Your Experience</string>
+    <string name="experience">Experience</string>
+    <string name="job_title">Job title</string>
+    <string name="job_information">Job Information</string>
+    <string name="company">Company</string>
+    <string name="failed_to_fetch_data_from_server">failed to fetch data from server</string>
+    <string name="no_data_to_show">No data to show</string>
+    <string name="expertise">Expertise</string>
+    <string name="overview">Overview</string>
+    <string name="success_register">Thanks for registering. You are now is login.</string>
+
+
+    <string name="fake_bio">"Experienced Android developer with over 5 years building and deploying apps to the Google Play Store. Skilled in Java, Kotlin, XML, Firebase, REST APIs, SQLite databases, and Material Design. Passionate about turning ideas into performant, beautiful mobile apps that delight users. Built messaging, weather, sports, and location-based apps each with over 100k downloads. Excited to join a fast-paced team to continue creating meaningful impacts in people's lives through mobile technology. Constantly learning and staying on top of latest Android advancements."</string>
+
+
+</resources>

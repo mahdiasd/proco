@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="very_tiny">8dp</dimen>
+    <dimen name="tiny">12dp</dimen>
+    <dimen name="small">14dp</dimen>
+    <dimen name="normal">16dp</dimen>
+    <dimen name="big">20dp</dimen>
+    <dimen name="title">18dp</dimen>
+
+    <dimen name="pd_2">2dp</dimen>
+    <dimen name="pd_0">0dp</dimen>
+    <dimen name="RoundCornerNormal">15dp</dimen>
+</resources>
