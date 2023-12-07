@@ -43,6 +43,7 @@ fun StepScreen(modifier: Modifier = Modifier, selectedIndex: Int, onClick: (Int)
                     text = steps[index],
                     isLastItem = index == steps.size - 1,
                     isSelected = index <= selectedIndex,
+                    isLineSelected = index == selectedIndex,
                     onClick = { onClick(index) }
                 )
             }
@@ -50,7 +51,7 @@ fun StepScreen(modifier: Modifier = Modifier, selectedIndex: Int, onClick: (Int)
 }
 
 @Composable
-private fun StepItem(number: Int, text: String, isLastItem: Boolean, isSelected: Boolean, onClick: () -> Unit) {
+private fun StepItem(number: Int, text: String, isLastItem: Boolean, isSelected: Boolean, isLineSelected: Boolean, onClick: () -> Unit) {
     ConstraintLayout(modifier = Modifier.animateClickable { onClick() }) {
         val numberRef = createRef()
         TitleMediumText(
@@ -89,7 +90,7 @@ private fun StepItem(number: Int, text: String, isLastItem: Boolean, isSelected:
                     }
                     .size(100.dp, 1.dp)
                     .then(
-                        if (isSelected) Modifier.background(MaterialTheme.colorScheme.primary)
+                        if (isLineSelected) Modifier.background(MaterialTheme.colorScheme.primary)
                         else Modifier.background(gray)
                     )
             )
