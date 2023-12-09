@@ -17,7 +17,7 @@ import com.proco.search.navigation.SearchScreenCompose
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = registerRoute) {
+    NavHost(navController = navController, startDestination = scheduleRoute) {
         loginScreen(onRegister = {
             navController.navigate(registerRoute)
         })
