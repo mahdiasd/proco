@@ -43,7 +43,7 @@ fun StepScreen(modifier: Modifier = Modifier, selectedIndex: Int, onClick: (Int)
                     text = steps[index],
                     isLastItem = index == steps.size - 1,
                     isSelected = index <= selectedIndex,
-                    isLineSelected = index == selectedIndex,
+                    isLineSelected = index < selectedIndex,
                     onClick = { onClick(index) }
                 )
             }

@@ -10,13 +10,13 @@ import java.io.IOException
 import java.net.HttpURLConnection
 
 
-suspend fun <T : Any> safeCall(execute: suspend () -> NetworkResponse<T>): DataResult<T> {
+suspend fun <T : Any> safeCall(execute: suspend () -> NetworkResponse<T>?): DataResult<T> {
     return try {
         val response = execute()
-        if (response.status == "success" && response.data != null) {
+        if (response != null && response.status == "success" && response.data != null) {
             DataResult.Success(response.data!!)
         } else {
-            "${response.getsMessage()} ".eLog(tag = "Retrofit", plusTag = "safeCall is not successful")
+            "${response!!.message.toString()} ".eLog(tag = "Retrofit", plusTag = "safeCall is not successful")
             DataResult.Failure(ErrorEntity.Unknown)
         }
     } catch (e: Throwable) {
@@ -26,32 +26,37 @@ suspend fun <T : Any> safeCall(execute: suspend () -> NetworkResponse<T>): DataR
 }
 
 fun getError(throwable: Throwable): ErrorEntity {
-    return when (throwable) {
-        is IOException -> ErrorEntity.IoException
-        is IllegalArgumentException -> ErrorEntity.IllegalArgumentException
-        is HttpException -> {
-            val errorBody: String = throwable.response()?.errorBody()?.string() ?: ""
-            val message = Json.decodeFromString<NetworkResponse<*>?>(errorBody)?.getsMessage() ?: ""
+    return try {
+        when (throwable) {
+            is IOException -> ErrorEntity.IoException
+            is IllegalArgumentException -> ErrorEntity.IllegalArgumentException
+            is HttpException -> {
+                val errorBody: String = throwable.response()?.errorBody()?.string() ?: ""
+                val message = Json.decodeFromString<NetworkResponse<*>?>(errorBody)?.message.toString() ?: ""
 
-            when (throwable.code()) {
-                // unauthorized
-                HttpURLConnection.HTTP_UNAUTHORIZED -> ErrorEntity.HttpException(message)
+                when (throwable.code()) {
+                    // unauthorized
+                    HttpURLConnection.HTTP_UNAUTHORIZED -> ErrorEntity.HttpException(message)
 
-                // not found
-                HttpURLConnection.HTTP_NOT_FOUND -> ErrorEntity.NotFound
+                    // not found
+                    HttpURLConnection.HTTP_NOT_FOUND -> ErrorEntity.NotFound
 
-                // access denied
-                HttpURLConnection.HTTP_FORBIDDEN -> ErrorEntity.AccessDenied
+                    // access denied
+                    HttpURLConnection.HTTP_FORBIDDEN -> ErrorEntity.AccessDenied
 
-                // unavailable service
-                HttpURLConnection.HTTP_SERVER_ERROR -> ErrorEntity.ServerUnavailable
+                    // unavailable service
+                    HttpURLConnection.HTTP_SERVER_ERROR -> ErrorEntity.ServerUnavailable
 
-                // all the others will be treated as unknown error
-                else -> ErrorEntity.Unknown
+                    // all the others will be treated as unknown error
+                    else -> ErrorEntity.Unknown
+                }
             }
-        }
 
-        else -> ErrorEntity.Unknown
+            else -> ErrorEntity.Unknown
+        }
+    } catch (e: Exception) {
+        "${e.message} ".eLog(tag = "Retrofit", plusTag = "safeCall exception")
+        ErrorEntity.Unknown
     }
 }
 

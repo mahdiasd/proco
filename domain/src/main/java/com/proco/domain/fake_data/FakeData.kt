@@ -1,13 +1,13 @@
 package com.proco.domain.fake_data
 
 import androidx.compose.runtime.toMutableStateList
-import com.proco.app.data.model.Skill
 import com.proco.domain.model.schedule.DayName
 import com.proco.domain.model.schedule.Schedule
 import com.proco.domain.model.time.HoursOfDay
 import com.proco.domain.model.user.Country
 import com.proco.domain.model.user.Expertise
 import com.proco.domain.model.user.Job
+import com.proco.domain.model.user.Skill
 import com.proco.domain.model.user.User
 import com.proco.domain.model.user.UserType
 import kotlinx.collections.immutable.ImmutableList
@@ -35,7 +35,7 @@ object FakeData {
             expertise = Expertise(0, name = "Android Developer"),
             experience = 0,
             company = "",
-            skills = listOf(Skill(id = 0, name = "#android")).toImmutableList(),
+            skills = listOf(Skill( name = "#android")).toImmutableList(),
             bio = "Experienced Android developer with over 5 years building and deploying apps to the Google Play Store. Skilled in Java, Kotlin, XML, Firebase, REST APIs, SQLite databases, and Material Design. Passionate about turning ideas into performant, beautiful mobile apps that delight users. Built messaging, weather, sports, and location-based apps each with over 100k downloads. Excited to join a fast-paced team to continue creating meaningful impacts in people's lives through mobile technology. Constantly learning and staying on top of latest Android advancements.",
             country = Country(code = "IR", name = "Iran")
         )

@@ -1,4 +1,4 @@
-package com.proco.domain
+package com.proco.domain.kotin_serializer
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList

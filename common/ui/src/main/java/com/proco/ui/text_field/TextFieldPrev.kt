@@ -3,6 +3,7 @@ package com.proco.ui.text_field
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerBasedShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -53,8 +54,8 @@ fun ProcoTextField(
     minLines: Int = 1,
     shape: CornerBasedShape = MaterialTheme.shapes.small,
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedTextColor = white,
-        unfocusedTextColor = MaterialTheme.colorScheme.primary,
+        focusedTextColor = MaterialTheme.colorScheme.surface,
+        unfocusedTextColor = MaterialTheme.colorScheme.surface,
         focusedBorderColor = MaterialTheme.colorScheme.primary,
         unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
         focusedContainerColor = MaterialTheme.colorScheme.secondary,
@@ -63,8 +64,10 @@ fun ProcoTextField(
     textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
     hintTextStyle: TextStyle = MaterialTheme.typography.bodyMedium.withColor(gray),
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     readOnly: Boolean = false,
-    textAlign: TextAlign = TextAlign.Start
+    textAlign: TextAlign = TextAlign.Start,
+    actionNext: Boolean = maxLines == 1
 ) {
 
 
@@ -78,7 +81,8 @@ fun ProcoTextField(
         readOnly = readOnly,
         minLines = minLines,
         colors = colors,
-        keyboardOptions = if (maxLines == 1) keyboardOptions.copy(imeAction = ImeAction.Next) else keyboardOptions,
+        keyboardActions = keyboardActions,
+        keyboardOptions = if (actionNext) keyboardOptions.copy(imeAction = ImeAction.Next) else keyboardOptions,
         placeholder = {
             BodyMediumText(
                 text = hint,

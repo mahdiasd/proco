@@ -22,13 +22,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.proco.app.data.model.Skill
 import com.proco.base.BaseScreen
 import com.proco.domain.model.user.Country
 import com.proco.domain.model.user.Experience
 import com.proco.domain.model.user.Expertise
 import com.proco.domain.model.user.Gender
 import com.proco.domain.model.user.Job
+import com.proco.domain.model.user.Skill
 import com.proco.domain.model.user.UserType
 import com.proco.domain.usecase.auth.RegisterParam
 import com.proco.extention.animateClickable
@@ -59,7 +59,9 @@ private fun RegisterScreenPreview() {
         onRegister = {},
         allCountries = null,
         allJobs = null,
-        allSkills = null
+        allSkills = null,
+        onAddSkill = {},
+        onRemoveSkill = {}
     )
 }
 
@@ -97,6 +99,7 @@ fun RegisterScreen(vm: RegisterViewModel = hiltViewModel(), onRegister: () -> Un
             onTyping = onTyping,
             onNextStep = { vm.onTriggerEvent(RegisterUiEvent.OnNextStep(it)) },
             onUserType = onUserType,
+            isLoading = uiState.isLoading,
             onGender = onGender,
             allJobs = uiState.allJobs,
             allCountries = uiState.allCountries,
@@ -104,7 +107,9 @@ fun RegisterScreen(vm: RegisterViewModel = hiltViewModel(), onRegister: () -> Un
             onCountry = { vm.onTriggerEvent(RegisterUiEvent.OnCountry(it)) },
             onExpertise = { vm.onTriggerEvent(RegisterUiEvent.OnExpertise(it)) },
             onJobTitle = { vm.onTriggerEvent(RegisterUiEvent.OnJobTitle(it)) },
-            onRegister = onRegister
+            onRegister = onRegister,
+            onAddSkill = { vm.onTriggerEvent(RegisterUiEvent.OnAddSkill(it)) },
+            onRemoveSkill = { vm.onTriggerEvent(RegisterUiEvent.OnRemoveSkill(it)) }
         )
     }
 
@@ -136,9 +141,13 @@ private fun RegisterScreenContent(
     onJobTitle: (Job) -> Unit,
     onExperience: (Experience) -> Unit,
     onRegister: () -> Unit,
+    isLoading: Boolean = false,
     allSkills: ImmutableList<Skill>?,
     allJobs: ImmutableList<Job>?,
     allCountries: ImmutableList<Country>?,
+    onAddSkill: (Skill) -> Unit,
+    onRemoveSkill: (Skill) -> Unit,
+
 ) {
 
     val userType by remember(registerParam.userType) { mutableStateOf(registerParam.userType) }
@@ -221,6 +230,8 @@ private fun RegisterScreenContent(
                     allSkills = allSkills,
                     onTyping = onTyping,
                     onExperience = onExperience,
+                    onAddSkill = onAddSkill,
+                    onRemoveSkill =onRemoveSkill
                 )
             }
         }
@@ -229,6 +240,7 @@ private fun RegisterScreenContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .animateClickable(onRegister),
+            isLoading = isLoading,
             text = stringResource(id = R.string.next_step),
             onClick = { onNextStep(currentStep + 1) }
         )

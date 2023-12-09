@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.proco.base.BaseViewModel
 import com.proco.domain.model.network.DataResult
 import com.proco.domain.model.network.getUiMessage
+import com.proco.domain.model.user.Skill
 import com.proco.domain.usecase.auth.RegisterUseCase
 import com.proco.domain.usecase.country.GetCountriesUseCase
 import com.proco.domain.usecase.job.GetJobsUseCase
@@ -18,7 +19,7 @@ import javax.inject.Inject
 class RegisterViewModel @Inject constructor(
     private val registerUseCase: RegisterUseCase,
     private val getCountriesUseCase: GetCountriesUseCase,
-    private val getJobsUseCase: GetJobsUseCase
+    private val getJobsUseCase: GetJobsUseCase,
 ) : BaseViewModel<RegisterUiState, RegisterUiEvent, RegisterUiEffect>() {
 
     init {
@@ -30,6 +31,7 @@ class RegisterViewModel @Inject constructor(
         viewModelScope.launch {
             setState { currentState.copy(isLoading = true) }
             registerUseCase.executeSync(currentState.data).collect {
+                setState { currentState.copy(isLoading = false) }
                 when (it) {
                     is DataResult.Failure -> setEffect { RegisterUiEffect.ErrorMessage(it.errorEntity.getUiMessage()) }
                     is DataResult.Success -> setEffect { RegisterUiEffect.SuccessRegister }
@@ -40,7 +42,6 @@ class RegisterViewModel @Inject constructor(
 
     private fun getCountries() {
         viewModelScope.launch {
-            setState { currentState.copy(isLoading = true) }
             getCountriesUseCase.executeSync(Unit).collect {
                 when (it) {
                     is DataResult.Failure -> setEffect { RegisterUiEffect.ErrorMessage(it.errorEntity.getUiMessage()) }
@@ -54,7 +55,6 @@ class RegisterViewModel @Inject constructor(
 
     private fun getJobs() {
         viewModelScope.launch {
-            setState { currentState.copy(isLoading = true) }
             getJobsUseCase.executeSync(Unit).collect {
                 when (it) {
                     is DataResult.Failure -> {
@@ -131,9 +131,19 @@ class RegisterViewModel @Inject constructor(
             is RegisterUiEvent.OnUserType -> setState { currentState.copy(data = data.copy(userType = event.userType)) }
             is RegisterUiEvent.OnGender -> setState { currentState.copy(data = data.copy(gender = event.gender)) }
             is RegisterUiEvent.OnCountry -> setState { currentState.copy(data = data.copy(country = event.country)) }
-            is RegisterUiEvent.OnExperience -> setState { currentState.copy(data = data.copy(experience = event.experience.index)) }
+            is RegisterUiEvent.OnExperience -> setState { currentState.copy(data = data.copy(experience = event.experience)) }
             is RegisterUiEvent.OnExpertise -> setState { currentState.copy(data = data.copy(expertise = event.expertise)) }
             is RegisterUiEvent.OnJobTitle -> setState { currentState.copy(data = data.copy(job = event.job)) }
+            is RegisterUiEvent.OnAddSkill -> {
+                val temp: MutableList<Skill> = currentState.data.skills?.toMutableList() ?: mutableListOf()
+                temp.add(event.skill)
+                setState { currentState.copy(data = data.copy(skills = temp.toImmutableList())) }
+            }
+            is RegisterUiEvent.OnRemoveSkill -> {
+                val temp: MutableList<Skill> = currentState.data.skills?.toMutableList() ?: mutableListOf()
+                temp.remove(event.skill)
+                setState { currentState.copy(data = data.copy(skills = temp.toImmutableList())) }
+            }
         }
     }
 }

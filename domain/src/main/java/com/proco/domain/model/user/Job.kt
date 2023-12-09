@@ -1,7 +1,7 @@
 package com.proco.domain.model.user
 
 import androidx.compose.runtime.Stable
-import com.proco.domain.ImmutableListSerializer
+import com.proco.domain.kotin_serializer.ImmutableListSerializer
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

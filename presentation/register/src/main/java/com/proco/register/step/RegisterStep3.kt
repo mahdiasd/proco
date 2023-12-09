@@ -10,7 +10,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -26,18 +30,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.proco.app.data.model.Skill
 import com.proco.domain.fake_data.FakeData
 import com.proco.domain.model.user.Experience
+import com.proco.domain.model.user.Skill
+import com.proco.extention.animateClickable
 import com.proco.extention.blackOrWhite
 import com.proco.extention.coloredShadow
 import com.proco.extention.withColor
 import com.proco.register.RegisterTypingType
+import com.proco.ui.R
 import com.proco.ui.bottom_dialog.ListBottomDialog
 import com.proco.ui.dialog_item.ExperienceItem
+import com.proco.ui.text.BodyLargeText
 import com.proco.ui.text.BodyMediumText
 import com.proco.ui.text.TitleLargeText
 import com.proco.ui.text_field.ProcoTextField
@@ -52,8 +60,10 @@ private fun Preview() {
             .fillMaxSize()
             .padding(16.dp),
         onTyping = { type, text -> },
-        experience = 0,
-        onExperience = {}
+        experience = null,
+        onExperience = {},
+        onAddSkill = {},
+        onRemoveSkill = {}
     )
 }
 
@@ -65,8 +75,10 @@ fun RegisterStep3(
     selectedSkills: ImmutableList<Skill>? = null,
     allSkills: ImmutableList<Skill>? = FakeData.skills().toImmutableList(),
     onTyping: (RegisterTypingType, String) -> Unit,
-    experience: Int,
+    experience: Experience?,
     onExperience: (Experience) -> Unit,
+    onAddSkill: (Skill) -> Unit,
+    onRemoveSkill: (Skill) -> Unit,
 ) {
     var skill by remember { mutableStateOf("") }
     var isShowExperienceDialog by remember { mutableStateOf(false) }
@@ -88,7 +100,7 @@ fun RegisterStep3(
 
         TitleLargeText(
             modifier = Modifier.fillMaxWidth(),
-            text = stringResource(com.proco.ui.R.string.your_experience),
+            text = stringResource(R.string.your_experience),
             textAlign = TextAlign.Start
         )
 
@@ -116,14 +128,15 @@ fun RegisterStep3(
         }
 
 
+
         ProcoTextField(
             modifier = Modifier.fillMaxWidth(),
             onClick = { isShowExperienceDialog = true },
-            value = if (experience == 0) "" else experience.toString(),
+            value = experience?.title?.let { "$it ${stringResource(id = R.string.year)}" } ?: "",
             onValueChange = { },
-            hint = stringResource(com.proco.ui.R.string.experience),
+            hint = stringResource(R.string.experience),
             enabled = false,
-            icon = com.proco.ui.R.drawable.ic_arrow
+            icon = R.drawable.ic_arrow
         )
 
 
@@ -131,22 +144,24 @@ fun RegisterStep3(
             modifier = Modifier.fillMaxWidth(),
             value = skill,
             onValueChange = { skill = it },
-            hint = stringResource(com.proco.ui.R.string.skills)
+            hint = stringResource(R.string.skill_typing_guide),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+            actionNext = false,
+            keyboardActions = KeyboardActions(onDone = {
+                onAddSkill(Skill(skill))
+                skill = ""
+            })
         )
 
         if (!selectedSkills.isNullOrEmpty()) {
             FlowRow(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+                verticalArrangement = Arrangement.Center
             ) {
                 selectedSkills.forEach {
-                    Row(
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
-                            .padding(4.dp)
-                    ) {
-                        Icon(painter = painterResource(id = com.proco.ui.R.drawable.ic_close), contentDescription = "Close Tag")
-                        BodyMediumText(text = it.name, color = MaterialTheme.colorScheme.primary)
-                    }
+                    SkillItem(it, onRemoveSkill = onRemoveSkill)
                 }
             }
         }
@@ -155,7 +170,7 @@ fun RegisterStep3(
             modifier = Modifier.fillMaxWidth(),
             value = bio,
             onValueChange = { onTyping(RegisterTypingType.Bio, it) },
-            hint = stringResource(com.proco.ui.R.string.bio),
+            hint = stringResource(R.string.bio),
             minLines = 4,
             maxLines = 10
         )
@@ -175,6 +190,35 @@ fun RegisterStep3(
                     onExperience(experienceList[index])
                 })
             }
+        )
+    }
+
+}
+
+@Composable
+fun SkillItem(skill: Skill, onRemoveSkill: (Skill) -> Unit) {
+    Row(
+        modifier = Modifier
+            .padding(end = 8.dp, bottom = 8.dp)
+            .background(MaterialTheme.colorScheme.secondary, MaterialTheme.shapes.small)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Icon(
+            modifier = Modifier
+                .size(20.dp)
+                .border(1.dp, MaterialTheme.colorScheme.surface, CircleShape)
+                .padding(2.dp)
+                .animateClickable { onRemoveSkill(skill) },
+            painter = painterResource(id = R.drawable.ic_close),
+            contentDescription = "Remove Tag",
+            tint = MaterialTheme.colorScheme.surface,
+        )
+
+        BodyLargeText(
+            modifier = Modifier.padding(bottom = 4.dp),
+            text = skill.name, color = MaterialTheme.colorScheme.surface, textAlign = TextAlign.Center
         )
     }
 

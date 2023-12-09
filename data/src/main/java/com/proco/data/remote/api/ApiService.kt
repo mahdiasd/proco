@@ -1,11 +1,11 @@
 package com.proco.data.remote.api
 
+import com.proco.data.model.RegisterRequest
 import com.proco.domain.model.network.NetworkResponse
 import com.proco.domain.model.schedule.ScheduleDto
 import com.proco.domain.model.user.Country
 import com.proco.domain.model.user.Job
 import com.proco.domain.model.user.User
-import com.proco.domain.usecase.auth.RegisterParam
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -37,7 +37,7 @@ interface ApiService {
     ): NetworkResponse<User>
 
     @POST("/auth/register")
-    suspend fun register(@Body registerParam: RegisterParam): NetworkResponse<User>
+    suspend fun register(@Body registerParam: RegisterRequest): NetworkResponse<User>
 
     @GET("/country")
     suspend fun getCountries(): NetworkResponse<List<Country>>

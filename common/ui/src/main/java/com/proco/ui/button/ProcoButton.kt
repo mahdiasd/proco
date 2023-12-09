@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.proco.extention.coloredShadow
 import com.proco.theme.white
+import com.proco.ui.loading.DotsPulsing
 import com.proco.ui.text.TitleLargeText
 
 @Preview
@@ -31,6 +32,7 @@ fun ProcoButton(
     fillMaxWidth: Boolean = true,
     text: String,
     textStyle: TextStyle = MaterialTheme.typography.titleLarge.copy(textAlign = TextAlign.Center),
+    isLoading: Boolean = false,
     onClick: () -> Unit
 ) {
     Button(
@@ -45,6 +47,9 @@ fun ProcoButton(
             .background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.dp)),
         onClick = onClick
     ) {
-        TitleLargeText(modifier = Modifier, text = text, textStyle = textStyle, maxLines = 1, color = white)
+        if (isLoading)
+            DotsPulsing()
+        else
+            TitleLargeText(modifier = Modifier, text = text, textStyle = textStyle, maxLines = 1, color = white)
     }
 }

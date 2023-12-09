@@ -1,5 +1,6 @@
 package com.proco.data.repository
 
+import com.proco.data.mapper.RegisterMapper
 import com.proco.data.remote.api.ApiService
 import com.proco.data.remote.utils.safeCall
 import com.proco.domain.model.network.DataResult
@@ -11,7 +12,8 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val registerMapper: RegisterMapper
 ) : UserRepository {
 
     override suspend fun login(email: String, password: String): Flow<DataResult<User>> = flow {
@@ -27,7 +29,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun register(registerParam: RegisterParam) = flow {
-        emit(safeCall { apiService.register(registerParam) })
+        emit(safeCall { apiService.register(registerMapper.mapFrom(registerParam)) })
     }
 
 

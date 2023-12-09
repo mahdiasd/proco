@@ -3,8 +3,14 @@ package com.proco.domain.model.user
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class Gender {
-    data object Male : Gender()
-    data object Female : Gender()
-    data object NonBinary : Gender()
+enum class Gender {
+    Male,
+    Female,
+    NonBinary;
+
+    override fun toString(): String {
+        return super.name.lowercase()
+    }
+
 }
+

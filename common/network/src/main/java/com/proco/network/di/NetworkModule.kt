@@ -52,7 +52,7 @@ object NetworkModule {
 
         // TODO remove logs from release mode
         val interceptor = HttpLoggingInterceptor(logger = {
-            it.dLog("Retrofit")
+            it.dLog(tag = "Retrofit")
         })
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         http.addInterceptor(interceptor).build()

@@ -6,19 +6,16 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Stable
 data class NetworkResponse<T>(
-    val status: String,
+    val status: String?,
     val appException: String? = null,
     val message: String? = null,
+    val messages: List<String>? = null,
     val data: T?
 ) {
 
-    fun getsMessage(): String {
-        return message.toString()
-//        return when (message) {
-//            is String -> message.joinToString(separator = "\\n")
-//            is String -> message
-//            else -> ""
-//        }
+    fun getParseMessage(): String {
+        return if (!messages.isNullOrEmpty()) messages.joinToString { "$it\n" } else if (!message.isNullOrEmpty()) message else ""
     }
 
 }
+
