@@ -1,15 +1,21 @@
 package com.proco.domain.model.network
 
-data class NetworkResponse(
+import androidx.compose.runtime.Stable
+import kotlinx.serialization.Serializable
+
+@Serializable
+@Stable
+data class NetworkResponse<T>(
+    val status: String?,
     val appException: String? = null,
-    val message: Any? = null,
-    val data: Any?
+    val message: String? = null,
+    val messages: List<String>? = null,
+    val data: T?
 ) {
-    fun getMessage(): String {
-        return when (message) {
-            is List<*> -> message.joinToString(separator = "\n")
-            is String -> message
-            else -> ""
-        }
+
+    fun getParseMessage(): String {
+        return if (!messages.isNullOrEmpty()) messages.joinToString { "$it\n" } else if (!message.isNullOrEmpty()) message else ""
     }
+
 }
+

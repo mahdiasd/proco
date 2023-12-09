@@ -22,16 +22,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.proco.app.data.model.Skill
 import com.proco.base.BaseScreen
 import com.proco.domain.model.user.Country
+import com.proco.domain.model.user.Experience
 import com.proco.domain.model.user.Expertise
 import com.proco.domain.model.user.Gender
 import com.proco.domain.model.user.Job
+import com.proco.domain.model.user.Skill
 import com.proco.domain.model.user.UserType
 import com.proco.domain.usecase.auth.RegisterParam
 import com.proco.extention.animateClickable
 import com.proco.extention.baseModifier
+import com.proco.extention.dLog
 import com.proco.register.step.RegisterStep1
 import com.proco.register.step.RegisterStep2
 import com.proco.register.step.RegisterStep3
@@ -45,7 +47,7 @@ import kotlinx.collections.immutable.ImmutableList
 @Composable
 private fun RegisterScreenPreview() {
     RegisterScreenContent(
-        registerDto = RegisterParam(),
+        registerParam = RegisterParam(),
         onTyping = { _, _ -> },
         onNextStep = { },
         onUserType = {},
@@ -55,7 +57,11 @@ private fun RegisterScreenPreview() {
         onJobTitle = {},
         onExperience = {},
         onRegister = {},
-        allSkills = null
+        allCountries = null,
+        allJobs = null,
+        allSkills = null,
+        onAddSkill = {},
+        onRemoveSkill = {}
     )
 }
 
@@ -87,18 +93,23 @@ fun RegisterScreen(vm: RegisterViewModel = hiltViewModel(), onRegister: () -> Un
         alertMessage = errorMessage
     ) {
         RegisterScreenContent(
-            registerDto = uiState.data,
+            registerParam = uiState.data,
             allSkills = uiState.allSkills,
             currentStep = uiState.currentStep,
             onTyping = onTyping,
             onNextStep = { vm.onTriggerEvent(RegisterUiEvent.OnNextStep(it)) },
             onUserType = onUserType,
+            isLoading = uiState.isLoading,
             onGender = onGender,
+            allJobs = uiState.allJobs,
+            allCountries = uiState.allCountries,
             onExperience = { vm.onTriggerEvent(RegisterUiEvent.OnExperience(it)) },
             onCountry = { vm.onTriggerEvent(RegisterUiEvent.OnCountry(it)) },
             onExpertise = { vm.onTriggerEvent(RegisterUiEvent.OnExpertise(it)) },
             onJobTitle = { vm.onTriggerEvent(RegisterUiEvent.OnJobTitle(it)) },
-            onRegister = onRegister
+            onRegister = onRegister,
+            onAddSkill = { vm.onTriggerEvent(RegisterUiEvent.OnAddSkill(it)) },
+            onRemoveSkill = { vm.onTriggerEvent(RegisterUiEvent.OnRemoveSkill(it)) }
         )
     }
 
@@ -119,7 +130,7 @@ fun RegisterScreen(vm: RegisterViewModel = hiltViewModel(), onRegister: () -> Un
 
 @Composable
 private fun RegisterScreenContent(
-    registerDto: RegisterParam,
+    registerParam: RegisterParam,
     currentStep: Int = 0,
     onTyping: (RegisterTypingType, String) -> Unit,
     onNextStep: (Int) -> Unit,
@@ -128,17 +139,23 @@ private fun RegisterScreenContent(
     onExpertise: (Expertise) -> Unit,
     onCountry: (Country) -> Unit,
     onJobTitle: (Job) -> Unit,
-    onExperience: (Int) -> Unit,
+    onExperience: (Experience) -> Unit,
     onRegister: () -> Unit,
+    isLoading: Boolean = false,
     allSkills: ImmutableList<Skill>?,
+    allJobs: ImmutableList<Job>?,
+    allCountries: ImmutableList<Country>?,
+    onAddSkill: (Skill) -> Unit,
+    onRemoveSkill: (Skill) -> Unit,
+
 ) {
 
-    val userType by remember(registerDto.userType) { mutableStateOf(registerDto.userType) }
-    val name by remember(registerDto.name) { mutableStateOf(registerDto.name) }
-    val family by remember(registerDto.family) { mutableStateOf(registerDto.family) }
-    val gender by remember(registerDto.gender) { mutableStateOf(registerDto.gender) }
-    val email by remember(registerDto.email) { mutableStateOf(registerDto.email) }
-    val password by remember(registerDto.password) { mutableStateOf(registerDto.password) }
+    val userType by remember(registerParam.userType) { mutableStateOf(registerParam.userType) }
+    val name by remember(registerParam.name) { mutableStateOf(registerParam.name) }
+    val family by remember(registerParam.family) { mutableStateOf(registerParam.family) }
+    val gender by remember(registerParam.gender) { mutableStateOf(registerParam.gender) }
+    val email by remember(registerParam.email) { mutableStateOf(registerParam.email) }
+    val password by remember(registerParam.password) { mutableStateOf(registerParam.password) }
 
     Column(
         modifier = Modifier
@@ -149,7 +166,10 @@ private fun RegisterScreenContent(
         StepScreen(
             modifier = Modifier.fillMaxWidth(),
             selectedIndex = currentStep,
-            onClick = onNextStep
+            onClick = {
+                it.dLog("o")
+                onNextStep(it)
+            }
         )
 
         Spacer(
@@ -185,10 +205,12 @@ private fun RegisterScreenContent(
                         .fillMaxSize()
                         .padding(vertical = 0.dp, horizontal = 16.dp)
                         .weight(1f),
-                    job = registerDto.job,
-                    expertise = registerDto.expertise,
-                    country = registerDto.country,
-                    company = registerDto.company,
+                    allCountries = allCountries,
+                    allJobs = allJobs,
+                    job = registerParam.job,
+                    expertise = registerParam.expertise,
+                    country = registerParam.country,
+                    company = registerParam.company,
                     onTyping = onTyping,
                     onExpertise = onExpertise,
                     onCountry = onCountry,
@@ -202,11 +224,14 @@ private fun RegisterScreenContent(
                         .fillMaxSize()
                         .padding(vertical = 0.dp, horizontal = 16.dp)
                         .weight(1f),
-                    bio = registerDto.bio,
-                    selectedSkills = registerDto.skills,
+                    bio = registerParam.bio,
+                    selectedSkills = registerParam.skills,
+                    experience = registerParam.experience,
                     allSkills = allSkills,
                     onTyping = onTyping,
                     onExperience = onExperience,
+                    onAddSkill = onAddSkill,
+                    onRemoveSkill =onRemoveSkill
                 )
             }
         }
@@ -215,6 +240,7 @@ private fun RegisterScreenContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .animateClickable(onRegister),
+            isLoading = isLoading,
             text = stringResource(id = R.string.next_step),
             onClick = { onNextStep(currentStep + 1) }
         )

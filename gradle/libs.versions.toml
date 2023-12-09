@@ -1,5 +1,5 @@
 [versions]
-agp = "8.1.2"
+agp = "8.2.0"
 androidx-datastorePreferences = "1.0.0"
 customactivityoncrash = "2.4.0"
 org-jetbrains-kotlin-android = "1.9.10"

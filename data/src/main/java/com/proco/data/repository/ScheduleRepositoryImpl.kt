@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 class ScheduleRepositoryImpl @Inject constructor(private val apiService: ApiService) : ScheduleRepository {
     override suspend fun saveSchedule(scheduleDtos: List<ScheduleDto>) = flow<DataResult<Boolean>> {
-        safeCall { apiService.saveSchedule(scheduleDtos) }
+        emit(safeCall { apiService.saveSchedule(scheduleDtos) })
     }
 }
 

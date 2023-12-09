@@ -59,7 +59,6 @@ fun ListBottomDialog(
     listItem: @Composable (index: Int) -> Unit
 ) {
     var searchText by remember { mutableStateOf("") }
-
     ModalBottomSheet(
         modifier = modifier,
         containerColor = containerColor,

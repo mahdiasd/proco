@@ -1,9 +1,10 @@
-package com.proco.app.data.model
+package com.proco.domain.model.user
 
 import androidx.compose.runtime.Stable
+import kotlinx.serialization.Serializable
 
 @Stable
+@Serializable
 data class Skill(
-    val id: Int = 0,
-    val name: String = "",
-    )
+    val name: String = ""
+)

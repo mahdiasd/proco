@@ -1,8 +1,9 @@
 package com.proco.domain.model.user
 
-import com.proco.app.data.model.Skill
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class User(
     val id: Int,
     val name: String,

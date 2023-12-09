@@ -3,7 +3,6 @@ package com.proco.app
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import app.ir.main.navigation.mainRoute
 import app.ir.main.navigation.mainScreen
 import app.ir.profile.navigation.ProfileScreenCompose
 import com.proco.filter.navigation.filterRoute
@@ -18,7 +17,7 @@ import com.proco.search.navigation.SearchScreenCompose
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = mainRoute) {
+    NavHost(navController = navController, startDestination = scheduleRoute) {
         loginScreen(onRegister = {
             navController.navigate(registerRoute)
         })

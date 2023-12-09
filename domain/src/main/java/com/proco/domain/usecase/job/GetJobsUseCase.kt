@@ -5,7 +5,6 @@ import com.proco.domain.model.user.Job
 import com.proco.domain.repository.JobRepository
 import com.proco.domain.usecase.ResultUseCase
 import com.proco.network.IoDispatcher
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -13,9 +12,9 @@ import javax.inject.Inject
 class GetJobsUseCase @Inject constructor(
     @IoDispatcher dispatcher: CoroutineDispatcher,
     private val repo: JobRepository
-) : ResultUseCase<Unit, Flow<DataResult<ImmutableList<Job>>>>(dispatcher) {
+) : ResultUseCase<Unit, Flow<DataResult<List<Job>>>>(dispatcher) {
 
-    override suspend fun doWork(params: Unit): Flow<DataResult<ImmutableList<Job>>> {
+    override suspend fun doWork(params: Unit): Flow<DataResult<List<Job>>> {
         return repo.getJobs()
     }
 }

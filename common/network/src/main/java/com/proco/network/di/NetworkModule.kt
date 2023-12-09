@@ -1,6 +1,7 @@
 package com.proco.network.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.proco.extention.dLog
 import com.proco.utils.MyConstant
 import dagger.Module
 import dagger.Provides
@@ -50,7 +51,9 @@ object NetworkModule {
         }).build()
 
         // TODO remove logs from release mode
-        val interceptor = HttpLoggingInterceptor()
+        val interceptor = HttpLoggingInterceptor(logger = {
+            it.dLog(tag = "Retrofit")
+        })
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         http.addInterceptor(interceptor).build()
 
@@ -67,5 +70,6 @@ object NetworkModule {
             .client(client.build())
             .build()
     }
+
 
 }

@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,8 +54,8 @@ private fun Preview() {
 @Composable
 fun RegisterStep2(
     modifier: Modifier,
-    countries: ImmutableList<Country> = FakeData.countries(),
-    jobs: ImmutableList<Job> = FakeData.jobTitles(),
+    allCountries: ImmutableList<Country>? = null,
+    allJobs: ImmutableList<Job>? = null,
     job: Job?,
     expertise: Expertise?,
     country: Country?,
@@ -68,7 +70,8 @@ fun RegisterStep2(
     var isShowCountryDialog by remember { mutableStateOf(false) }
 
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(32.dp, alignment = Alignment.Top)
     ) {
@@ -120,44 +123,44 @@ fun RegisterStep2(
     }
 
 
-    if (isShowJobTitleDialog) {
+    if (isShowJobTitleDialog && allJobs != null) {
         ListBottomDialog(
             modifier = Modifier.fillMaxWidth(),
-            listSize = 3,
+            listSize = allJobs.size,
             isShowSearch = false,
-            onDismissDialog = { isShowCountryDialog = false },
+            onDismissDialog = { isShowJobTitleDialog = false },
             listItem = { index ->
-                JobItems(jobs[index], onClick = {
+                JobItems(allJobs[index], onClick = {
                     isShowJobTitleDialog = false
-                    onJobTitle(jobs[index])
+                    onJobTitle(allJobs[index])
                 })
             }
         )
     }
 
-    if (isShowCountryDialog) {
+    if (isShowCountryDialog && allCountries != null) {
         ListBottomDialog(
             modifier = Modifier.fillMaxWidth(),
-            listSize = 3,
+            listSize = allCountries.size,
             isShowSearch = false,
             onDismissDialog = { isShowCountryDialog = false },
             listItem = { index ->
-                CountryItem(countries[index], onClick = {
+                CountryItem(allCountries[index], onClick = {
                     isShowCountryDialog = false
-                    onCountry(countries[index])
+                    onCountry(allCountries[index])
                 })
             }
         )
     }
 
-    if (isShowExpertiseDialog) {
+    if (isShowExpertiseDialog && job != null) {
         ListBottomDialog(
             modifier = Modifier.fillMaxWidth(),
-            listSize = 3,
+            listSize = job.expertises.size,
             isShowSearch = false,
             onDismissDialog = { isShowExpertiseDialog = false },
             listItem = { index ->
-                ExpertiseItem(job!!.expertises[index], onClick = {
+                ExpertiseItem(job.expertises[index], onClick = {
                     isShowExpertiseDialog = false
                     onExpertise(job.expertises[index])
                 })

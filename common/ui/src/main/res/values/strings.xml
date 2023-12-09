@@ -29,6 +29,8 @@
     <string name="name">Name</string>
     <string name="family">Family</string>
     <string name="skills">Skills</string>
+    <string name="skill_typing_guide">Skills (Press enter to add skill)</string>
+    <string name="year">Year</string>
     <string name="bio">Bio</string>
     <string name="empty_bio">Bio is not written by Mentor.</string>
     <string name="next_step">Next step</string>
