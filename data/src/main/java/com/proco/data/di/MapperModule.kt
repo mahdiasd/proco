@@ -1,6 +1,7 @@
 package com.proco.data.di
 
 import com.proco.data.mapper.RegisterMapper
+import com.proco.data.mapper.ScheduleMapper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,6 +16,11 @@ object MapperModule {
     @Provides
     fun provideRegisterMapper(): RegisterMapper {
         return RegisterMapper()
+    }
+    @Singleton
+    @Provides
+    fun provideScheduleMapper(): ScheduleMapper {
+        return ScheduleMapper()
     }
 
 }

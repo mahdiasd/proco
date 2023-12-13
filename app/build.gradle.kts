@@ -22,6 +22,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
     }
 
     buildTypes {
@@ -34,6 +35,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -54,6 +56,7 @@ android {
 }
 
 dependencies {
+
     implementation(project(":data"))
     implementation(project(":domain"))
     implementation(project(":common:ui"))
@@ -65,6 +68,8 @@ dependencies {
     implementation(project(":presentation:main"))
     implementation(project(":presentation:profile"))
 
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.lifecycle.runtime.ktx)
@@ -74,6 +79,8 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
+
+
 
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.navigation.compose)
@@ -95,6 +102,13 @@ dependencies {
     implementation(libs.kotlinx.serialization.converter)
 
     /* -------------------------- ↓ tests ↓ -------------------------- */
+    testImplementation (libs.mockito.kotlin)
+    testImplementation (libs.kotlinx.coroutines.test)
+
+    androidTestImplementation (libs.dagger.hilt.android.testing)
+    kspAndroidTest (libs.dagger.hilt.android.compiler)
+    kspAndroidTest (libs.dagger.hilt.android.testing)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

@@ -17,7 +17,7 @@ data class SearchViewState(
     val searchText: String = "",
     val currentStep: Int = 0,
     val userFilter: UserFilter? = UserFilter(),
-    val page: Int = MyConstant.DefaultPageNumber,
+    val page: Int = MyConstant.defaultPageNumber,
 ) : BaseUiState<ImmutableList<User>?>
 
 

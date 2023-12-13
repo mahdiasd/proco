@@ -42,7 +42,7 @@ import com.proco.extention.coilCircle
 import com.proco.theme.ProcoTheme
 import com.proco.ui.R
 import com.proco.ui.button.ProcoButton
-import com.proco.ui.dash_line.VerticalDashLine
+import com.proco.ui.dash_line.HorizontalDashLine
 import com.proco.ui.error.ErrorScreen
 import com.proco.ui.loading.LoadingScreen
 import com.proco.ui.spacer.CustomSpacer
@@ -139,10 +139,11 @@ private fun ProfileScreenContent(
 
             Icon(
                 modifier = Modifier.size(32.dp),
-                painter = painterResource(id = R.drawable.ic_edit), contentDescription = "Edit")
+                painter = painterResource(id = R.drawable.ic_edit), contentDescription = "Edit"
+            )
         }
 
-        VerticalDashLine()
+        HorizontalDashLine(modifier = Modifier.fillMaxWidth())
 
         TabRow(
             modifier = Modifier.fillMaxWidth(),

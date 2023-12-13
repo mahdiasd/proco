@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.proco.ui"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 21
@@ -24,6 +24,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -39,7 +40,10 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+
     implementation(project(":domain"))
+    implementation(project(":common:utils"))
 
     api(libs.appcompat)
     api(libs.core.ktx)
@@ -56,7 +60,6 @@ dependencies {
     api(libs.constraintlayout)
     api(libs.kotlinx.collections.immutable)
 
-
     api(libs.core.ktx)
     api(libs.appcompat)
     api(libs.material)
@@ -65,12 +68,17 @@ dependencies {
 
     api(libs.accompanist.swiperefresh)
 
+    /*--------------------- Tests -------------------------------*/
+    testApi(libs.mockito.kotlin)
+    testApi(libs.kotlinx.coroutines.test)
+    androidTestApi(libs.dagger.hilt.android.testing)
+    kspAndroidTest(libs.dagger.hilt.android.compiler)
+    kspAndroidTest(libs.dagger.hilt.android.testing)
     testApi(libs.junit)
+    androidTestApi(libs.ui.test.junit4)
     androidTestApi(libs.androidx.test.ext.junit)
     androidTestApi(libs.espresso.core)
     androidTestApi(platform(libs.compose.bom))
-    androidTestApi(libs.ui.test.junit4)
     debugApi(libs.ui.tooling)
     debugApi(libs.ui.test.manifest)
-    
 }

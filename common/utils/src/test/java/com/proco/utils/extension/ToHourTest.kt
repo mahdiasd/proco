@@ -11,6 +11,18 @@ class ToHourTest {
         Assert.assertEquals("0".toHour(), "0")
         Assert.assertEquals("9".toHour(), "9")
     }
+    @Test
+    fun `toHour should handle 1-digit input for complete less than ten`() {
+        Assert.assertEquals("0".toHour(true), "00")
+        Assert.assertEquals("9".toHour(true), "09")
+    }
+    @Test
+    fun `toHour should handle 1-digit input for int`() {
+        Assert.assertEquals(0.toHour(true), "00")
+        Assert.assertEquals(9.toHour(true), "09")
+        Assert.assertEquals(13.toHour(true), "13")
+        Assert.assertEquals(14.toHour(true), "14")
+    }
 
     @Test
     fun `toHour should handle 2-digit input`() {

@@ -30,7 +30,7 @@ import com.proco.ui.text.BodyMediumText
 
 @Preview
 @Composable
-fun TextFieldPrev() {
+private fun TextFieldPrev() {
     ProcoTheme {
         ProcoTextField(value = "Name", onValueChange = {}, hint = "")
     }
@@ -38,7 +38,7 @@ fun TextFieldPrev() {
 
 @Preview
 @Composable
-fun TextFieldIconPrev() {
+private fun TextFieldIconPrev() {
     ProcoTheme {
         ProcoTextField(value = "Name", onValueChange = {}, hint = "", icon = R.drawable.ic_arrow)
     }
