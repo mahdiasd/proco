@@ -1,7 +1,9 @@
 package com.proco.data.di
 
+import com.proco.data.data_store.TokenDataStoreImpl
 import com.proco.data.data_store.UserDataStoreImpl
 import com.proco.data.data_store.UserFilterDataStoreImpl
+import com.proco.domain.data_store.TokenDataStore
 import com.proco.domain.data_store.UserDataStore
 import com.proco.domain.data_store.UserFilterDataStore
 import dagger.Binds
@@ -18,4 +20,7 @@ abstract class BindDataStores {
 
     @Binds
     abstract fun bindUser(impl: UserDataStoreImpl): UserDataStore
+
+    @Binds
+    abstract fun bindToken(impl: TokenDataStoreImpl): TokenDataStore
 }

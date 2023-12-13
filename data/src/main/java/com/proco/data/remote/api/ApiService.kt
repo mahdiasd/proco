@@ -1,5 +1,6 @@
 package com.proco.data.remote.api
 
+import com.proco.data.model.LoginResponse
 import com.proco.data.model.RegisterRequest
 import com.proco.domain.model.network.NetworkResponse
 import com.proco.domain.model.schedule.ScheduleDto
@@ -16,7 +17,7 @@ interface ApiService {
 
     @POST("/auth/login")
     @FormUrlEncoded
-    suspend fun login(@Field("email") email: String, @Field("password") password: String): NetworkResponse<User>
+    suspend fun login(@Field("email") email: String, @Field("password") password: String): NetworkResponse<LoginResponse>
 
     @POST
     suspend fun saveSchedule(@Body scheduleDto: List<ScheduleDto>): NetworkResponse<Boolean>

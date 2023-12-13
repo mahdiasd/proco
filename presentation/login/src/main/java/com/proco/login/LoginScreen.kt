@@ -51,6 +51,7 @@ fun LoginScreen(
     val uiState = vm.uiState.collectAsState().value
     BaseScreen(modifier = Modifier.baseModifier()) {
         LoginScreenContent(
+            isLoading = uiState.isLoading,
             email = uiState.username,
             password = uiState.password,
             onEmailChanged = { vm.onUsernameChanged(it) },
@@ -64,6 +65,7 @@ fun LoginScreen(
 
 @Composable
 private fun LoginScreenContent(
+    isLoading: Boolean = false,
     email: String = "",
     password: String = "",
     onEmailChanged: (String) -> Unit = {},
@@ -117,7 +119,7 @@ private fun LoginScreenContent(
 
                 CustomSpacer(48.dp)
 
-                ProcoButton(modifier = Modifier.fillMaxWidth(), text = stringResource(id = com.proco.ui.R.string.login), onClick = onLogin)
+                ProcoButton(modifier = Modifier.fillMaxWidth(), text = stringResource(id = com.proco.ui.R.string.login), isLoading = isLoading, onClick = onLogin)
             }
 
             BodyLargeText(

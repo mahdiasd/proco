@@ -3,7 +3,6 @@ package com.proco.ui.button
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -43,8 +42,8 @@ fun ProcoButton(
                 else Modifier
             )
             .coloredShadow(MaterialTheme.colorScheme.primary, borderRadius = 15.dp, offsetY = 10.dp)
-            .shadow(elevation = 10.dp, shape = RoundedCornerShape(8.dp), spotColor = MaterialTheme.colorScheme.primary)
-            .background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.dp)),
+            .shadow(elevation = 10.dp, shape = MaterialTheme.shapes.small, spotColor = MaterialTheme.colorScheme.primary)
+            .background(color = MaterialTheme.colorScheme.primary, shape = MaterialTheme.shapes.small),
         onClick = onClick
     ) {
         if (isLoading)

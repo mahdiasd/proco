@@ -14,14 +14,15 @@ class LoginViewModel @Inject constructor(private val useCase: LoginUseCase) : Ba
 
     private fun login() {
         viewModelScope.launch {
-            setState { currentState.copy(isLoading = true, alertMessage = null) }
+            setState { currentState.copy(isLoading = true) }
             useCase.executeSync(LoginUseCase.LoginParam(currentState.username, currentState.password)).collect {
                 when (it) {
                     is DataResult.Success -> {
-                        setState { currentState.copy(isLoading = false, data = it.data, alertMessage = null) }
+                        setState { currentState.copy(isLoading = false, isLoggedIn = true) }
                     }
 
                     is DataResult.Failure -> {
+                        setState { currentState.copy(isLoading = false) }
                         setEffect { LoginUiEffect.ShowToast(it.errorEntity.getUiMessage()) }
                     }
                 }

@@ -1,19 +1,17 @@
 package com.proco.login
 
 import androidx.compose.runtime.Stable
-import com.proco.base.BaseUiState
 import com.proco.base.UiEffect
 import com.proco.base.UiEvent
-import com.proco.domain.model.user.User
+import com.proco.base.UiState
 
 @Stable
 data class LoginUiState(
-    override val isLoading: Boolean = false,
-    override val data: User? = null,
-    override val alertMessage: String? = null,
-    val username: String = "",
-    val password: String = "",
-) : BaseUiState<User>
+    val isLoading: Boolean = false,
+    val isLoggedIn: Boolean = false,
+    val username: String = "mah@gmail.com",
+    val password: String = "12345678",
+) : UiState
 
 
 sealed class LoginUiEvent : UiEvent {

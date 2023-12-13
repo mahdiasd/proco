@@ -16,7 +16,7 @@ suspend fun <T : Any> safeCall(execute: suspend () -> NetworkResponse<T>?): Data
         if (response != null && response.status == "success" && response.data != null) {
             DataResult.Success(response.data!!)
         } else {
-            "${response!!.message.toString()} ".eLog(tag = "Retrofit", plusTag = "safeCall is not successful")
+            "${response!!.getParseMessage().toString()} ".eLog(tag = "Retrofit", plusTag = "safeCall is not successful")
             DataResult.Failure(ErrorEntity.Unknown)
         }
     } catch (e: Throwable) {
@@ -32,7 +32,7 @@ fun getError(throwable: Throwable): ErrorEntity {
             is IllegalArgumentException -> ErrorEntity.IllegalArgumentException
             is HttpException -> {
                 val errorBody: String = throwable.response()?.errorBody()?.string() ?: ""
-                val message = Json.decodeFromString<NetworkResponse<*>?>(errorBody)?.message.toString() ?: ""
+                val message = Json.decodeFromString<NetworkResponse<*>?>(errorBody)?.getParseMessage().toString() ?: ""
 
                 when (throwable.code()) {
                     // unauthorized

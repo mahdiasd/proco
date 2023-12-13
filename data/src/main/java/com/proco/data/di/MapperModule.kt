@@ -17,6 +17,7 @@ object MapperModule {
     fun provideRegisterMapper(): RegisterMapper {
         return RegisterMapper()
     }
+
     @Singleton
     @Provides
     fun provideScheduleMapper(): ScheduleMapper {
