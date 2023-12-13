@@ -1,9 +1,9 @@
 package com.proco.domain.repository
 
 import com.proco.domain.model.network.DataResult
-import com.proco.domain.model.schedule.ScheduleDto
+import com.proco.domain.model.schedule.Schedule
 import kotlinx.coroutines.flow.Flow
 
 interface ScheduleRepository {
-    suspend fun saveSchedule(scheduleDtos: List<ScheduleDto>): Flow<DataResult<Boolean>>
+    suspend fun saveSchedule(schedule: List<Schedule>): Flow<DataResult<Boolean>>
 }

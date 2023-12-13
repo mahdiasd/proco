@@ -3,6 +3,7 @@ package app.ir.main
 import androidx.lifecycle.viewModelScope
 import com.proco.base.BaseViewModel
 import com.proco.domain.fake_data.FakeData
+import com.proco.domain.model.user.UserType
 import com.proco.domain.usecase.user.GetUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -23,7 +24,7 @@ class MainViewModel @Inject constructor(
             getUseCase.executeSync(GetUserUseCase.DataSourceType.Local).collect {
 //                setState { currentState.copy(user = it) }
                 // TODO: replaced real data with this line
-                setState { currentState.copy(user = FakeData.user()) }
+                setState { currentState.copy(user = FakeData.user().copy(type = UserType.Mentor)) }
             }
         }
     }

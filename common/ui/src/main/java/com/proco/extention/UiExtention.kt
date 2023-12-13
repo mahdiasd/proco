@@ -12,7 +12,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -115,14 +114,10 @@ fun screenSizePx(): DisplayMetrics {
     return Resources.getSystem().displayMetrics
 }
 
-fun Modifier.baseModifier() = composed {
-    Modifier
+fun Modifier.baseModifier(): Modifier = composed {
+    this
         .fillMaxSize()
         .navigationBarsPadding()
-    then(
-        if (hasNotch()) Modifier.statusBarsPadding()
-        else Modifier
-    )
         .background(MaterialTheme.colorScheme.background)
         .safeContentPadding()
 }

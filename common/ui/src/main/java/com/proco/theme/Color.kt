@@ -44,7 +44,7 @@ val gradient3 = Color(0xFFBC3AD3)
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-val colorPrimaryDark = Color(0xFF7986CB)
+val colorPrimaryDark = Color(0xFF39ace7)
 val textColorDark = Color(0xFF1D1F24)
 val secondaryDark = Color(0xFF33373F)
 val backgroundDark = Color(0xFF121212)

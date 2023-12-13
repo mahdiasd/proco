@@ -1,7 +1,5 @@
 package com.proco.domain.fake_data
 
-import androidx.compose.runtime.toMutableStateList
-import com.proco.domain.model.schedule.DayName
 import com.proco.domain.model.schedule.Schedule
 import com.proco.domain.model.time.HoursOfDay
 import com.proco.domain.model.user.Country
@@ -12,6 +10,9 @@ import com.proco.domain.model.user.User
 import com.proco.domain.model.user.UserType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 
 object FakeData {
@@ -35,7 +36,7 @@ object FakeData {
             expertise = Expertise(0, name = "Android Developer"),
             experience = 0,
             company = "",
-            skills = listOf(Skill( name = "#android")).toImmutableList(),
+            skills = listOf(Skill(name = "#android")).toImmutableList(),
             bio = "Experienced Android developer with over 5 years building and deploying apps to the Google Play Store. Skilled in Java, Kotlin, XML, Firebase, REST APIs, SQLite databases, and Material Design. Passionate about turning ideas into performant, beautiful mobile apps that delight users. Built messaging, weather, sports, and location-based apps each with over 100k downloads. Excited to join a fast-paced team to continue creating meaningful impacts in people's lives through mobile technology. Constantly learning and staying on top of latest Android advancements.",
             country = Country(code = "IR", name = "Iran")
         )
@@ -61,17 +62,8 @@ object FakeData {
     }
 
     fun schedules(): List<Schedule> {
+        val temp = LocalDateTime.of(LocalDate.parse("2023-12-09"), LocalTime.parse("2023-12-09"))
         return listOf(
-            Schedule(dayName = DayName.Saturday, hours = listOf<HoursOfDay>().toMutableStateList()),
-            Schedule(dayName = DayName.Sunday, hours = listOf<HoursOfDay>().toMutableStateList()),
-            Schedule(dayName = DayName.Monday, hours = listOf<HoursOfDay>().toMutableStateList()),
-            Schedule(dayName = DayName.Tuesday, hours = listOf<HoursOfDay>().toMutableStateList()),
-            Schedule(
-                dayName = DayName.Wednesday,
-                hours = listOf<HoursOfDay>().toMutableStateList()
-            ),
-            Schedule(dayName = DayName.Thursday, hours = listOf<HoursOfDay>().toMutableStateList()),
-            Schedule(dayName = DayName.Friday, hours = listOf<HoursOfDay>().toMutableStateList()),
         )
     }
 

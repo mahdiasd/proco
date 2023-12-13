@@ -23,10 +23,10 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.proco.domain.model.user.UserType
-import com.proco.extention.dLog
 import com.proco.theme.ProcoTheme
 import com.proco.ui.R
 import com.proco.ui.text.BodyMediumText
@@ -112,7 +112,7 @@ fun BottomNavigation(
     bookingScreen: @Composable () -> Unit,
     invoiceScreen: @Composable () -> Unit,
 ) {
-    var selectedItem: NavBarItem by remember { mutableStateOf(NavBarItem.Profile) }
+    var selectedItem: NavBarItem by remember { mutableStateOf(NavBarItem.Schedule) }
 
     val itemClick: (NavBarItem) -> Unit = {
         selectedItem = it
@@ -137,11 +137,10 @@ fun BottomNavigation(
             }
         },
     ) {
-        selectedItem.dLog()
         Box(
             modifier = Modifier
+                .padding(horizontal = it.calculateLeftPadding(LayoutDirection.Ltr))
                 .fillMaxSize()
-                .padding(it)
         ) {
             when (selectedItem) {
                 NavBarItem.Search -> searchScreen()
@@ -176,7 +175,7 @@ fun RowScope.AddItem(screen: NavBarItem, onClick: () -> Unit, isSelected: Boolea
             selectedTextColor = MaterialTheme.colorScheme.primary,
             unselectedIconColor = MaterialTheme.colorScheme.surface,
             unselectedTextColor = MaterialTheme.colorScheme.surface,
-            indicatorColor= MaterialTheme.colorScheme.background
+            indicatorColor = MaterialTheme.colorScheme.background
         )
     )
 }

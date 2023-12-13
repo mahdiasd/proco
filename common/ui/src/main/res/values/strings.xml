@@ -8,9 +8,15 @@
     <string name="invoice">Invoice</string>
     <string name="booking">Booking</string>
     <string name="schedule">Schedule</string>
+    <string name="cancel">Cancel</string>
 
-    <string name="day_of_week">Day of week</string>
-    <string name="hours_of_day">Hours of day</string>
+    <string name="enter_start_time">Enter start time</string>
+    <string name="enter_end_time">Enter end time</string>
+
+    <string name="minute">Minute</string>
+    <string name="hour">Hour</string>
+    <string name="min_range_of_time_error">The minimum range allowed is 15 minutes.</string>
+    <string name="overlap_range_time">The selected time overlaps with the time you selected before.</string>
 
     <string name="see_all">See All</string>
     <string name="save">Save</string>
@@ -57,6 +63,7 @@
     <string name="overview">Overview</string>
     <string name="success_register">Thanks for registering. You are now is login.</string>
 
+    <string name="add_time">Add Time</string>
 
     <string name="fake_bio">"Experienced Android developer with over 5 years building and deploying apps to the Google Play Store. Skilled in Java, Kotlin, XML, Firebase, REST APIs, SQLite databases, and Material Design. Passionate about turning ideas into performant, beautiful mobile apps that delight users. Built messaging, weather, sports, and location-based apps each with over 100k downloads. Excited to join a fast-paced team to continue creating meaningful impacts in people's lives through mobile technology. Constantly learning and staying on top of latest Android advancements."</string>
 

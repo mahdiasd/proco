@@ -14,5 +14,6 @@ object MyConstant {
 
     // values
     val DownloadDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path + File.separator
-    const val DefaultPageNumber = 1
+    const val defaultPageNumber = 1
+    const val minRangeTime  = 15
 }

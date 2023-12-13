@@ -27,17 +27,17 @@ import com.proco.utils.ProcoGravity
 private fun Prev() {
     ProcoTheme {
         Column {
-            BodyLargeText(text = "this is BodyLargeText preview")
-            BodyMediumText(text = "this is BodyMediumText preview")
+            LabelLargeText(text = "this is LabelLargeText preview")
+            LabelMediumText(text = "this is LabelMediumText preview")
         }
     }
 }
 
 @Composable
-fun BodyLargeText(
+fun LabelLargeText(
     modifier: Modifier = Modifier,
     text: String,
-    textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
+    textStyle: TextStyle = MaterialTheme.typography.labelLarge,
     textAlign: TextAlign = TextAlign.Start,
     color: Color = MaterialTheme.colorScheme.surface
 ) {
@@ -45,10 +45,10 @@ fun BodyLargeText(
 }
 
 @Composable
-fun BodyMediumText(
+fun LabelMediumText(
     modifier: Modifier = Modifier,
     text: String,
-    textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
+    textStyle: TextStyle = MaterialTheme.typography.labelMedium,
     textAlign: TextAlign = TextAlign.Start,
     color: Color = MaterialTheme.colorScheme.surface
 ) {
@@ -56,10 +56,10 @@ fun BodyMediumText(
 }
 
 @Composable
-fun BodyMediumText(
+fun LabelMediumText(
     modifier: Modifier = Modifier,
     text: String,
-    textStyle: TextStyle = MaterialTheme.typography.bodyMedium.withColor(),
+    textStyle: TextStyle = MaterialTheme.typography.labelMedium.withColor(),
     textAlign: TextAlign = TextAlign.Start,
     icon: Int,
     iconModifier: Modifier = Modifier.size(16.dp),
