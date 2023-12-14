@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -54,6 +56,7 @@ import com.proco.ui.text.TitleMediumText
 import com.proco.utils.ProcoGravity
 import kotlinx.collections.immutable.toImmutableList
 import java.time.Instant
+import java.time.LocalDateTime
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -100,9 +103,9 @@ fun ScheduleScreen(vm: ScheduleViewModel = hiltViewModel()) {
                 vm.onTriggerEvent(ScheduleUiEvent.OnRemoveHour(date, hours))
             },
             showSaveButton = uiState.showSaveButton,
-            onSave = {vm.onTriggerEvent(ScheduleUiEvent.OnSchedule)}
+            onSave = { vm.onTriggerEvent(ScheduleUiEvent.OnSchedule) }
 
-            )
+        )
     }
 
 
@@ -118,7 +121,7 @@ private fun ScheduleScreenContent(
     onSave: () -> Unit
 ) {
 
-    val datePickerState = rememberDatePickerState(Instant.now().toEpochMilli())
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = Instant.now().toEpochMilli(), yearRange = IntRange(LocalDateTime.now().year , LocalDateTime.now().year))
     val selectedDate: Instant by remember(datePickerState.selectedDateMillis) { mutableStateOf(datePickerState.selectedDateMillis?.toInstant() ?: Instant.now()) }
 
     var isShowTimePicker by remember { mutableStateOf(false) }
@@ -128,6 +131,7 @@ private fun ScheduleScreenContent(
 
     Column(
         modifier = Modifier
+            .verticalScroll(rememberScrollState())
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
@@ -181,7 +185,10 @@ private fun ScheduleScreenContent(
         }
 
         if (showSaveButton)
-            ProcoButton(text = stringResource(id = R.string.save), onClick = onSave)
+            ProcoButton(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally), text = stringResource(id = R.string.save), onClick = onSave
+            )
     }
 
 

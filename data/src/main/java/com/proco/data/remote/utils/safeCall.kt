@@ -1,7 +1,8 @@
 package com.proco.data.remote.utils
 
 import com.proco.domain.model.network.DataResult
-import com.proco.domain.model.network.ErrorEntity
+import com.proco.domain.model.network.NetworkError
+import com.proco.domain.model.network.NetworkException
 import com.proco.domain.model.network.NetworkResponse
 import com.proco.extention.eLog
 import kotlinx.serialization.json.Json
@@ -17,7 +18,7 @@ suspend fun <T : Any> safeCall(execute: suspend () -> NetworkResponse<T>?): Data
             DataResult.Success(response.data!!)
         } else {
             "${response!!.getParseMessage().toString()} ".eLog(tag = "Retrofit", plusTag = "safeCall is not successful")
-            DataResult.Failure(ErrorEntity.Unknown)
+            DataResult.Failure(NetworkError.Unknown)
         }
     } catch (e: Throwable) {
         "${e.message} ".eLog(tag = "Retrofit", plusTag = "safeCall exception")
@@ -25,38 +26,38 @@ suspend fun <T : Any> safeCall(execute: suspend () -> NetworkResponse<T>?): Data
     }
 }
 
-fun getError(throwable: Throwable): ErrorEntity {
+fun getError(throwable: Throwable): NetworkError {
     return try {
         when (throwable) {
-            is IOException -> ErrorEntity.IoException
-            is IllegalArgumentException -> ErrorEntity.IllegalArgumentException
+            is IOException -> NetworkError.IoException
+            is IllegalArgumentException -> NetworkError.IllegalArgumentException
             is HttpException -> {
                 val errorBody: String = throwable.response()?.errorBody()?.string() ?: ""
-                val message = Json.decodeFromString<NetworkResponse<*>?>(errorBody)?.getParseMessage().toString() ?: ""
+                val message = Json.decodeFromString<NetworkException?>(errorBody)?.getParseMessage().toString() ?: ""
 
                 when (throwable.code()) {
                     // unauthorized
-                    HttpURLConnection.HTTP_UNAUTHORIZED -> ErrorEntity.HttpException(message)
+                    HttpURLConnection.HTTP_UNAUTHORIZED -> NetworkError.HttpException(message)
 
                     // not found
-                    HttpURLConnection.HTTP_NOT_FOUND -> ErrorEntity.NotFound
+                    HttpURLConnection.HTTP_NOT_FOUND -> NetworkError.NotFound
 
                     // access denied
-                    HttpURLConnection.HTTP_FORBIDDEN -> ErrorEntity.AccessDenied
+                    HttpURLConnection.HTTP_FORBIDDEN -> NetworkError.AccessDenied
 
                     // unavailable service
-                    HttpURLConnection.HTTP_SERVER_ERROR -> ErrorEntity.ServerUnavailable
+                    HttpURLConnection.HTTP_SERVER_ERROR -> NetworkError.ServerUnavailable
 
                     // all the others will be treated as unknown error
-                    else -> ErrorEntity.Unknown
+                    else -> NetworkError.Unknown
                 }
             }
 
-            else -> ErrorEntity.Unknown
+            else -> NetworkError.Unknown
         }
     } catch (e: Exception) {
-        "${e.message} ".eLog(tag = "Retrofit", plusTag = "safeCall exception")
-        ErrorEntity.Unknown
+        "${e.message} ".eLog(tag = "Retrofit", plusTag = "safeCall getError exception")
+        NetworkError.Unknown
     }
 }
 

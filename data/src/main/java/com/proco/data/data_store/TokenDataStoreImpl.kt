@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.proco.domain.data_store.TokenDataStore
 import com.proco.domain.model.network.DataResult
-import com.proco.domain.model.network.ErrorEntity
+import com.proco.domain.model.network.NetworkError
 import com.proco.extention.safeDecode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -28,7 +28,7 @@ class TokenDataStoreImpl @Inject constructor(private val dataStore: DataStore<Pr
     override suspend fun readToken(): Flow<DataResult<String>> {
         return dataStore.data.map {
             val token = Json.safeDecode<String>(it[tokenKey])
-            if (token == null) DataResult.Failure(ErrorEntity.AccessDenied)
+            if (token == null) DataResult.Failure(NetworkError.AccessDenied)
             else DataResult.Success(token)
         }
     }

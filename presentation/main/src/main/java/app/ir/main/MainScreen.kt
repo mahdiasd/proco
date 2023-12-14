@@ -139,7 +139,7 @@ fun BottomNavigation(
     ) {
         Box(
             modifier = Modifier
-                .padding(horizontal = it.calculateLeftPadding(LayoutDirection.Ltr))
+                .padding(start = it.calculateLeftPadding(LayoutDirection.Ltr) , end = it.calculateLeftPadding(LayoutDirection.Ltr) , bottom = it.calculateBottomPadding())
                 .fillMaxSize()
         ) {
             when (selectedItem) {

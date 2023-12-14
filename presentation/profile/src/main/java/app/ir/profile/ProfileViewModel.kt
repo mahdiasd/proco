@@ -29,7 +29,7 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             getUserUseCase.executeSync(GetUserUseCase.DataSourceType.Local).collect {
                 when (it) {
-                    is DataResult.Failure -> setState { currentState.copy(alertMessage = it.errorEntity.getUiMessage()) }
+                    is DataResult.Failure -> setState { currentState.copy(alertMessage = it.networkError.getUiMessage()) }
                     is DataResult.Success -> {
                         userId = it.data.id
                         getUser()
@@ -46,7 +46,7 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             getUserUseCase.executeSync(GetUserUseCase.DataSourceType.Local).collect {
                 when (it) {
-                    is DataResult.Failure -> setState { currentState.copy(alertMessage = it.errorEntity.getUiMessage()) }
+                    is DataResult.Failure -> setState { currentState.copy(alertMessage = it.networkError.getUiMessage()) }
                     is DataResult.Success -> {
                         setState { currentState.copy(isLoading = false, alertMessage = null, data = it.data) }
                     }

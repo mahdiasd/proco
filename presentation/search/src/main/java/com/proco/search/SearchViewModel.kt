@@ -37,7 +37,7 @@ class SearchViewModel @Inject constructor(
                     }
 
                     is DataResult.Failure -> {
-                        setEffect { SearchUiEffect.ShowError(it.errorEntity.getUiMessage()) }
+                        setEffect { SearchUiEffect.ShowError(it.networkError.getUiMessage()) }
                     }
                 }
             }

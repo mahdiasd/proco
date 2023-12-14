@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.proco.domain.data_store.UserDataStore
 import com.proco.domain.model.network.DataResult
-import com.proco.domain.model.network.ErrorEntity
+import com.proco.domain.model.network.NetworkError
 import com.proco.domain.model.user.User
 import com.proco.extention.safeDecode
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +29,7 @@ class UserDataStoreImpl @Inject constructor(private val dataStore: DataStore<Pre
     override suspend fun readUser(): Flow<DataResult<User>> {
         return dataStore.data.map {
             val user = Json.safeDecode<User>(it[userFilterKey])
-            if (user == null) DataResult.Failure(ErrorEntity.AccessDenied)
+            if (user == null) DataResult.Failure(NetworkError.AccessDenied)
             else DataResult.Success(user)
         }
     }

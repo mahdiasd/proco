@@ -33,7 +33,7 @@ class RegisterViewModel @Inject constructor(
             registerUseCase.executeSync(currentState.data).collect {
                 setState { currentState.copy(isLoading = false) }
                 when (it) {
-                    is DataResult.Failure -> setEffect { RegisterUiEffect.ErrorMessage(it.errorEntity.getUiMessage()) }
+                    is DataResult.Failure -> setEffect { RegisterUiEffect.ErrorMessage(it.networkError.getUiMessage()) }
                     is DataResult.Success -> setEffect { RegisterUiEffect.SuccessRegister }
                 }
             }
@@ -44,7 +44,7 @@ class RegisterViewModel @Inject constructor(
         viewModelScope.launch {
             getCountriesUseCase.executeSync(Unit).collect {
                 when (it) {
-                    is DataResult.Failure -> setEffect { RegisterUiEffect.ErrorMessage(it.errorEntity.getUiMessage()) }
+                    is DataResult.Failure -> setEffect { RegisterUiEffect.ErrorMessage(it.networkError.getUiMessage()) }
                     is DataResult.Success -> {
                         setState { copy(allCountries = it.data.toImmutableList()) }
                     }
@@ -58,7 +58,7 @@ class RegisterViewModel @Inject constructor(
             getJobsUseCase.executeSync(Unit).collect {
                 when (it) {
                     is DataResult.Failure -> {
-                        setEffect { RegisterUiEffect.ErrorMessage(it.errorEntity.getUiMessage()) }
+                        setEffect { RegisterUiEffect.ErrorMessage(it.networkError.getUiMessage()) }
                     }
 
                     is DataResult.Success -> setState { copy(allJobs = it.data.toImmutableList()) }

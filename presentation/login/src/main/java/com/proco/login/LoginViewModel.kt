@@ -1,21 +1,22 @@
 package com.proco.login
 
 import androidx.lifecycle.viewModelScope
+import com.proco.base.BaseUiEffect
 import com.proco.base.BaseViewModel
 import com.proco.domain.model.network.DataResult
-import com.proco.domain.model.network.getUiMessage
 import com.proco.domain.usecase.auth.LoginUseCase
+import com.proco.ui.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(private val useCase: LoginUseCase) : BaseViewModel<LoginUiState, LoginUiEvent, LoginUiEffect>() {
+class LoginViewModel @Inject constructor(private val useCase: LoginUseCase) : BaseViewModel<LoginUiState, LoginUiEvent, BaseUiEffect>() {
 
     private fun login() {
         viewModelScope.launch {
             setState { currentState.copy(isLoading = true) }
-            useCase.executeSync(LoginUseCase.LoginParam(currentState.username, currentState.password)).collect {
+            useCase.executeSync(LoginUseCase.LoginParam(currentState.email, currentState.password)).collect {
                 when (it) {
                     is DataResult.Success -> {
                         setState { currentState.copy(isLoading = false, isLoggedIn = true) }
@@ -23,7 +24,7 @@ class LoginViewModel @Inject constructor(private val useCase: LoginUseCase) : Ba
 
                     is DataResult.Failure -> {
                         setState { currentState.copy(isLoading = false) }
-                        setEffect { LoginUiEffect.ShowToast(it.errorEntity.getUiMessage()) }
+                        setEffect { BaseUiEffect.NetworkError(it.networkError) }
                     }
                 }
             }
@@ -32,8 +33,8 @@ class LoginViewModel @Inject constructor(private val useCase: LoginUseCase) : Ba
 
     private fun validate(): Boolean {
         when {
-            currentState.username.isEmpty() -> setEffect { LoginUiEffect.EmptyEmail }
-            currentState.password.isEmpty() -> setEffect { LoginUiEffect.EmptyPassword }
+            currentState.email.isEmpty() -> setEffect { BaseUiEffect.UiError(R.string.empty_email) }
+            currentState.password.isEmpty() -> setEffect { BaseUiEffect.UiError(R.string.password) }
             else -> return true
         }
 
@@ -41,7 +42,7 @@ class LoginViewModel @Inject constructor(private val useCase: LoginUseCase) : Ba
     }
 
     fun onUsernameChanged(username: String) {
-        setState { currentState.copy(username = username) }
+        setState { currentState.copy(email = username) }
     }
 
     fun onPasswordChanged(password: String) {

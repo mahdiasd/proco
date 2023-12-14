@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,13 +47,22 @@ private fun Preview() {
 @Composable
 fun LoginScreen(
     vm: LoginViewModel = hiltViewModel(),
-    onRegister: () -> Unit
+    onRegister: () -> Unit,
+    onLoggedIn: () -> Unit,
 ) {
     val uiState = vm.uiState.collectAsState().value
+
+    LaunchedEffect(key1 = uiState.isLoggedIn) {
+        if (uiState.isLoggedIn)
+            onLoggedIn()
+    }
+
+
+    
     BaseScreen(modifier = Modifier.baseModifier()) {
         LoginScreenContent(
             isLoading = uiState.isLoading,
-            email = uiState.username,
+            email = uiState.email,
             password = uiState.password,
             onEmailChanged = { vm.onUsernameChanged(it) },
             onPasswordChanged = { vm.onPasswordChanged(it) },
