@@ -92,7 +92,7 @@ fun ScheduleScreen(vm: ScheduleViewModel = hiltViewModel()) {
 
     BaseScreen(
         modifier = Modifier.baseModifier(),
-        alertMessage = uiState.alertMessage
+        uiMessage = null
     ) {
         ScheduleScreenContent(
             schedules = uiState.localSchedule,

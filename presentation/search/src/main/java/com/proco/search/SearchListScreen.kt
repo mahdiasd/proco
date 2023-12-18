@@ -46,6 +46,17 @@ private fun Preview() {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+private fun DarkPreview() {
+    ProcoTheme(true) {
+        SearchScreenContent(
+            onFilter = { },
+            onItemClick = { }
+        )
+    }
+}
+
 @Composable
 fun SearchScreen(
     vm: SearchViewModel = hiltViewModel(),
@@ -58,7 +69,7 @@ fun SearchScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
-        alertMessage = uiState.alertMessage
+        uiMessage = null
     ) {
         SearchScreenContent(
             onFilter = onFilter,
@@ -92,7 +103,6 @@ private fun SearchScreenContent(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-
                 .statusBarsPadding()
                 .padding(vertical = 16.dp, horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,

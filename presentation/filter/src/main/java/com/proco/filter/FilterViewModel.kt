@@ -2,21 +2,30 @@ package com.proco.filter
 
 import androidx.lifecycle.viewModelScope
 import com.proco.base.BaseViewModel
+import com.proco.base.UiMessage
 import com.proco.domain.model.filter.UserFilter
+import com.proco.domain.model.network.DataResult
+import com.proco.domain.usecase.country.GetCountriesUseCase
 import com.proco.domain.usecase.filter.GetUserFilterUseCase
 import com.proco.domain.usecase.filter.SaveUserFilterUseCase
+import com.proco.domain.usecase.job.GetJobsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class FilterViewModel @Inject constructor(
     private val getUseCase: GetUserFilterUseCase,
-    private val saveUseCase: SaveUserFilterUseCase
-) : BaseViewModel<FilterUiState, FilterUiEvent, FilterUiEffect>() {
+    private val saveUseCase: SaveUserFilterUseCase,
+    private val getCountriesUseCase: GetCountriesUseCase,
+    private val getJobsUseCase: GetJobsUseCase
+) : BaseViewModel<FilterUiState, FilterUiEvent>() {
 
     init {
         read()
+        getJobs()
+        getCountries()
     }
 
     private fun save() {
@@ -24,6 +33,31 @@ class FilterViewModel @Inject constructor(
             saveUseCase.executeSync(currentState.userFilter)
         }
     }
+
+    private fun getCountries() {
+        viewModelScope.launch {
+            getCountriesUseCase.executeSync(Unit).collect {
+                when (it) {
+                    is DataResult.Failure -> setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
+                    is DataResult.Success -> {
+                        setState { copy(countries = it.data.toImmutableList()) }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getJobs() {
+        viewModelScope.launch {
+            getJobsUseCase.executeSync(Unit).collect {
+                when (it) {
+                    is DataResult.Failure -> setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
+                    is DataResult.Success -> setState { copy(jobs = it.data.toImmutableList()) }
+                }
+            }
+        }
+    }
+
 
     private fun read() {
         viewModelScope.launch {

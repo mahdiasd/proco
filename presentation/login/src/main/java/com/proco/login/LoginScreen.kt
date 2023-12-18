@@ -52,14 +52,13 @@ fun LoginScreen(
 ) {
     val uiState = vm.uiState.collectAsState().value
 
+
     LaunchedEffect(key1 = uiState.isLoggedIn) {
         if (uiState.isLoggedIn)
             onLoggedIn()
     }
-
-
     
-    BaseScreen(modifier = Modifier.baseModifier()) {
+    BaseScreen(modifier = Modifier.baseModifier(), uiMessage = uiState.uiMessage) {
         LoginScreenContent(
             isLoading = uiState.isLoading,
             email = uiState.email,

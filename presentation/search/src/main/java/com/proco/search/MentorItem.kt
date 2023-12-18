@@ -27,6 +27,7 @@ import com.proco.extention.blackOrWhite
 import com.proco.extention.coilCircle
 import com.proco.extention.coloredShadow
 import com.proco.extention.withColor
+import com.proco.theme.ProcoTheme
 import com.proco.ui.R
 import com.proco.ui.text.BodyLargeText
 import com.proco.ui.text.BodyMediumText
@@ -35,7 +36,9 @@ import com.proco.utils.ProcoGravity
 @Preview
 @Composable
 private fun Preview() {
-    MentorItem(user = FakeData.users().first(), onClick = {})
+    ProcoTheme {
+        MentorItem(user = FakeData.users().first(), onClick = {})
+    }
 }
 
 @Composable

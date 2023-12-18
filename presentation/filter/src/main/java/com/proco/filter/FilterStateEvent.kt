@@ -3,8 +3,8 @@ package com.proco.filter
 import androidx.compose.runtime.Stable
 import com.proco.base.UiEffect
 import com.proco.base.UiEvent
+import com.proco.base.UiMessage
 import com.proco.base.UiState
-import com.proco.domain.fake_data.FakeData
 import com.proco.domain.model.filter.UserFilter
 import com.proco.domain.model.user.Country
 import com.proco.domain.model.user.Gender
@@ -14,9 +14,10 @@ import kotlinx.collections.immutable.toImmutableList
 
 @Stable
 data class FilterUiState(
+    val uiMessage: UiMessage? = null,
     val userFilter: UserFilter = UserFilter(),
-    val countries: ImmutableList<Country>? = FakeData.countries(),
-    val jobs: ImmutableList<Job>? = FakeData.jobTitles(),
+    val countries: ImmutableList<Country>? = null,
+    val jobs: ImmutableList<Job>? = null,
     val gender: ImmutableList<Gender>? = listOf(Gender.Female, Gender.Male, Gender.NonBinary).toImmutableList(),
 ) : UiState
 

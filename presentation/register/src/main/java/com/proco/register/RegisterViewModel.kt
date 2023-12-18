@@ -2,14 +2,15 @@ package com.proco.register
 
 import androidx.lifecycle.viewModelScope
 import com.proco.base.BaseViewModel
+import com.proco.base.UiMessage
 import com.proco.domain.model.network.DataResult
-import com.proco.domain.model.network.getUiMessage
 import com.proco.domain.model.user.Skill
 import com.proco.domain.usecase.auth.RegisterUseCase
 import com.proco.domain.usecase.country.GetCountriesUseCase
 import com.proco.domain.usecase.job.GetJobsUseCase
 import com.proco.extention.dLog
 import com.proco.extention.isNull
+import com.proco.ui.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
@@ -20,7 +21,7 @@ class RegisterViewModel @Inject constructor(
     private val registerUseCase: RegisterUseCase,
     private val getCountriesUseCase: GetCountriesUseCase,
     private val getJobsUseCase: GetJobsUseCase,
-) : BaseViewModel<RegisterUiState, RegisterUiEvent, RegisterUiEffect>() {
+) : BaseViewModel<RegisterUiState, RegisterUiEvent>() {
 
     init {
         getJobs()
@@ -28,23 +29,24 @@ class RegisterViewModel @Inject constructor(
     }
 
     private fun register() {
+        setState { currentState.copy(isLoading = true, uiMessage = null) }
         viewModelScope.launch {
-            setState { currentState.copy(isLoading = true) }
             registerUseCase.executeSync(currentState.data).collect {
                 setState { currentState.copy(isLoading = false) }
                 when (it) {
-                    is DataResult.Failure -> setEffect { RegisterUiEffect.ErrorMessage(it.networkError.getUiMessage()) }
-                    is DataResult.Success -> setEffect { RegisterUiEffect.SuccessRegister }
+                    is DataResult.Failure -> setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
+                    is DataResult.Success -> setState { currentState.copy(isRegistered = true) }
                 }
             }
         }
     }
 
+
     private fun getCountries() {
         viewModelScope.launch {
             getCountriesUseCase.executeSync(Unit).collect {
                 when (it) {
-                    is DataResult.Failure -> setEffect { RegisterUiEffect.ErrorMessage(it.networkError.getUiMessage()) }
+                    is DataResult.Failure -> setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
                     is DataResult.Success -> {
                         setState { copy(allCountries = it.data.toImmutableList()) }
                     }
@@ -57,10 +59,7 @@ class RegisterViewModel @Inject constructor(
         viewModelScope.launch {
             getJobsUseCase.executeSync(Unit).collect {
                 when (it) {
-                    is DataResult.Failure -> {
-                        setEffect { RegisterUiEffect.ErrorMessage(it.networkError.getUiMessage()) }
-                    }
-
+                    is DataResult.Failure -> setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
                     is DataResult.Success -> setState { copy(allJobs = it.data.toImmutableList()) }
                 }
             }
@@ -70,28 +69,28 @@ class RegisterViewModel @Inject constructor(
     private fun validate(): Boolean {
         return when {
             currentState.data.name.isEmpty() -> {
-                setEffect { RegisterUiEffect.EmptyName }
+                setState { currentState.copy(uiMessage = UiMessage.System(R.string.empty_name)) }
                 false
             }
 
             currentState.data.family.isEmpty() -> {
-                setEffect { RegisterUiEffect.EmptyFamily }
+                setState { currentState.copy(uiMessage = UiMessage.System(R.string.empty_family)) }
                 false
             }
 
             currentState.data.email.isEmpty() -> {
-                setEffect { RegisterUiEffect.EmptyEmail }
+                setState { currentState.copy(uiMessage = UiMessage.System(R.string.empty_email)) }
                 false
             }
 
             currentState.data.password.isEmpty() -> {
-                setEffect { RegisterUiEffect.EmptyPassword }
+                setState { currentState.copy(uiMessage = UiMessage.System(R.string.empty_password)) }
                 false
             }
 
             currentState.data.job.isNull() -> {
                 if (currentState.currentStep == 1) {
-                    setEffect { RegisterUiEffect.EmptyJobTitle }
+                    setState { currentState.copy(uiMessage = UiMessage.System(R.string.empty_job_title)) }
                     false
                 } else {
                     true
@@ -139,6 +138,7 @@ class RegisterViewModel @Inject constructor(
                 temp.add(event.skill)
                 setState { currentState.copy(data = data.copy(skills = temp.toImmutableList())) }
             }
+
             is RegisterUiEvent.OnRemoveSkill -> {
                 val temp: MutableList<Skill> = currentState.data.skills?.toMutableList() ?: mutableListOf()
                 temp.remove(event.skill)

@@ -4,8 +4,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import com.proco.base.BaseUiState
-import com.proco.base.UiEffect
 import com.proco.base.UiEvent
+import com.proco.base.UiMessage
 import com.proco.domain.model.schedule.HourRange
 import com.proco.domain.model.schedule.Schedule
 import kotlinx.collections.immutable.ImmutableList
@@ -16,9 +16,10 @@ import java.time.Instant
 data class ScheduleUiState(
     override val isLoading: Boolean = false,
     override val data: ImmutableList<Schedule> = listOf<Schedule>().toImmutableList(),
-    override val alertMessage: String? = "",
+    override val uiMessage: UiMessage? = null,
     val localSchedule: SnapshotStateList<Schedule> = data.toMutableStateList(),
-    val showSaveButton: Boolean = false
+    val showSaveButton: Boolean = false,
+    val isSaved: Boolean = false,
 ) : BaseUiState<ImmutableList<Schedule>>
 
 sealed class ScheduleUiEvent : UiEvent {
@@ -27,7 +28,3 @@ sealed class ScheduleUiEvent : UiEvent {
     data class OnRemoveHour(val date: Instant, val hourRange: HourRange) : ScheduleUiEvent()
 }
 
-sealed class ScheduleUiEffect : UiEffect {
-    data class ShowToast(val message: String) : ScheduleUiEffect()
-    data object EmptySchedule : ScheduleUiEffect()
-}

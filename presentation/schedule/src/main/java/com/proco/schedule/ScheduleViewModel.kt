@@ -3,6 +3,8 @@ package com.proco.schedule
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
 import com.proco.base.BaseViewModel
+import com.proco.base.UiMessage
+import com.proco.domain.model.network.DataResult
 import com.proco.domain.model.schedule.Schedule
 import com.proco.domain.usecase.ScheduleUseCase
 import com.proco.extention.findIndex
@@ -13,12 +15,21 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ScheduleViewModel @Inject constructor(private val useCase: ScheduleUseCase) : BaseViewModel<ScheduleUiState, ScheduleUiEvent, ScheduleUiEffect>() {
+class ScheduleViewModel @Inject constructor(private val useCase: ScheduleUseCase) : BaseViewModel<ScheduleUiState, ScheduleUiEvent>() {
 
     private fun save() {
         viewModelScope.launch {
-            setState { currentState.copy(isLoading = true, alertMessage = null) }
+            setState { currentState.copy(isLoading = true, uiMessage = null, isSaved = false) }
             useCase.executeSync(currentState.localSchedule).collect {
+                when (it) {
+                    is DataResult.Failure -> {
+                        setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
+                    }
+
+                    is DataResult.Success -> {
+                        setState { currentState.copy(isSaved = true) }
+                    }
+                }
             }
         }
     }
@@ -38,7 +49,12 @@ class ScheduleViewModel @Inject constructor(private val useCase: ScheduleUseCase
                     currentState.localSchedule[index] = currentState.localSchedule[index].copy(hours = hours.toImmutableList())
                     setState { currentState.copy(localSchedule = localSchedule, showSaveButton = true) }
                 } ?: run {
-                    setState { currentState.copy(localSchedule = localSchedule.apply { safeAdd(Schedule(event.date, hours = listOf(event.hourRange).toImmutableList())) }, showSaveButton = true) }
+                    setState {
+                        currentState.copy(
+                            localSchedule = localSchedule.apply { safeAdd(Schedule(event.date, hours = listOf(event.hourRange).toImmutableList())) },
+                            showSaveButton = true
+                        )
+                    }
                 }
             }
 

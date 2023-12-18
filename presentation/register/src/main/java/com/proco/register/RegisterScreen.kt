@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.proco.base.BaseScreen
 import com.proco.domain.model.user.Country
 import com.proco.domain.model.user.Experience
@@ -69,7 +67,6 @@ private fun RegisterScreenPreview() {
 fun RegisterScreen(vm: RegisterViewModel = hiltViewModel(), onRegister: () -> Unit) {
     val context = LocalContext.current
     val uiState = vm.uiState.collectAsState().value
-    val uiEffect = vm.uiEffect.collectAsStateWithLifecycle(null).value
     var errorMessage by remember { mutableStateOf("") }
 
     val onTyping = remember<((RegisterTypingType, String) -> Unit)> {
@@ -90,7 +87,7 @@ fun RegisterScreen(vm: RegisterViewModel = hiltViewModel(), onRegister: () -> Un
 
     BaseScreen(
         modifier = Modifier.baseModifier(),
-        alertMessage = errorMessage
+        uiMessage = uiState.uiMessage
     ) {
         RegisterScreenContent(
             registerParam = uiState.data,
@@ -111,19 +108,6 @@ fun RegisterScreen(vm: RegisterViewModel = hiltViewModel(), onRegister: () -> Un
             onAddSkill = { vm.onTriggerEvent(RegisterUiEvent.OnAddSkill(it)) },
             onRemoveSkill = { vm.onTriggerEvent(RegisterUiEvent.OnRemoveSkill(it)) }
         )
-    }
-
-    LaunchedEffect(key1 = uiEffect) {
-        errorMessage = when (uiEffect) {
-            RegisterUiEffect.EmptyEmail -> context.getString(R.string.empty_email)
-            RegisterUiEffect.EmptyFamily -> context.getString(R.string.empty_family)
-            RegisterUiEffect.EmptyJobTitle -> context.getString(R.string.empty_job_title)
-            RegisterUiEffect.EmptyName -> context.getString(R.string.empty_name)
-            RegisterUiEffect.EmptyPassword -> context.getString(R.string.empty_password)
-            is RegisterUiEffect.ErrorMessage -> uiEffect.message
-            null -> ""
-            RegisterUiEffect.SuccessRegister -> context.getString(R.string.success_register)
-        }
     }
 }
 

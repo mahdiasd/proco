@@ -2,8 +2,8 @@ package com.proco.search
 
 import androidx.lifecycle.viewModelScope
 import com.proco.base.BaseViewModel
+import com.proco.base.UiMessage
 import com.proco.domain.model.network.DataResult
-import com.proco.domain.model.network.getUiMessage
 import com.proco.domain.usecase.GetMentorListUseCase
 import com.proco.domain.usecase.filter.GetUserFilterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,13 +15,14 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     private val useCase: GetMentorListUseCase,
     private val getUserFilterUseCase: GetUserFilterUseCase
-) : BaseViewModel<SearchViewState, SearchViewEvent, SearchUiEffect>() {
+) : BaseViewModel<SearchViewState, SearchViewEvent>() {
 
     init {
         getUserFilter()
     }
 
     private fun getUsers() {
+        setState { currentState.copy(isLoading = true, uiMessage = null) }
         viewModelScope.launch {
             useCase.executeSync(
                 GetMentorListUseCase.GetMentorListParam(
@@ -33,11 +34,11 @@ class SearchViewModel @Inject constructor(
             ).collect {
                 when (it) {
                     is DataResult.Success -> {
-                        setState { currentState.copy(isLoading = false, data = it.data.toImmutableList(), alertMessage = null) }
+                        setState { currentState.copy(isLoading = false, data = it.data.toImmutableList(), uiMessage = null) }
                     }
 
                     is DataResult.Failure -> {
-                        setEffect { SearchUiEffect.ShowError(it.networkError.getUiMessage()) }
+                        setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
                     }
                 }
             }

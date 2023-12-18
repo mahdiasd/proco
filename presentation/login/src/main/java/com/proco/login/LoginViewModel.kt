@@ -1,8 +1,8 @@
 package com.proco.login
 
 import androidx.lifecycle.viewModelScope
-import com.proco.base.BaseUiEffect
 import com.proco.base.BaseViewModel
+import com.proco.base.UiMessage
 import com.proco.domain.model.network.DataResult
 import com.proco.domain.usecase.auth.LoginUseCase
 import com.proco.ui.R
@@ -11,11 +11,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(private val useCase: LoginUseCase) : BaseViewModel<LoginUiState, LoginUiEvent, BaseUiEffect>() {
+class LoginViewModel @Inject constructor(private val useCase: LoginUseCase) : BaseViewModel<LoginUiState, LoginUiEvent>() {
 
     private fun login() {
         viewModelScope.launch {
-            setState { currentState.copy(isLoading = true) }
+            setState { currentState.copy(isLoading = true , uiMessage = null) }
             useCase.executeSync(LoginUseCase.LoginParam(currentState.email, currentState.password)).collect {
                 when (it) {
                     is DataResult.Success -> {
@@ -23,8 +23,7 @@ class LoginViewModel @Inject constructor(private val useCase: LoginUseCase) : Ba
                     }
 
                     is DataResult.Failure -> {
-                        setState { currentState.copy(isLoading = false) }
-                        setEffect { BaseUiEffect.NetworkError(it.networkError) }
+                        setState { currentState.copy(isLoading = false, uiMessage = UiMessage.Network(it.networkError)) }
                     }
                 }
             }
@@ -32,9 +31,10 @@ class LoginViewModel @Inject constructor(private val useCase: LoginUseCase) : Ba
     }
 
     private fun validate(): Boolean {
+        setState { currentState.copy(uiMessage = null) }
         when {
-            currentState.email.isEmpty() -> setEffect { BaseUiEffect.UiError(R.string.empty_email) }
-            currentState.password.isEmpty() -> setEffect { BaseUiEffect.UiError(R.string.password) }
+            currentState.email.isEmpty() -> setState { currentState.copy(uiMessage = UiMessage.System(R.string.empty_email)) }
+            currentState.password.isEmpty() -> setState { currentState.copy(uiMessage = UiMessage.System(R.string.password)) }
             else -> return true
         }
 

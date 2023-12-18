@@ -12,7 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val getUseCase: GetUserUseCase,
-) : BaseViewModel<MainUiState, MainUiEvent, MainUiEffect>() {
+) : BaseViewModel<MainUiState, MainUiEvent>() {
 
     init {
         getUser()
@@ -24,7 +24,7 @@ class MainViewModel @Inject constructor(
             getUseCase.executeSync(GetUserUseCase.DataSourceType.Local).collect {
 //                setState { currentState.copy(user = it) }
                 // TODO: replaced real data with this line
-                setState { currentState.copy(user = FakeData.user().copy(type = UserType.Mentor)) }
+                setState { currentState.copy(user = FakeData.user().copy(type = UserType.Mentee)) }
             }
         }
     }

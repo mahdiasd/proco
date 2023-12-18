@@ -76,13 +76,13 @@ fun ProfileScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
-        alertMessage = uiState.alertMessage
+        uiMessage = null
     ) {
 
         if (uiState.isLoading) {
             LoadingScreen()
         } else if (uiState.data == null) {
-            ErrorScreen(modifier = Modifier.fillMaxSize(), errorMessage = uiState.alertMessage.toString())
+            ErrorScreen(modifier = Modifier.fillMaxSize(), errorMessage = uiState.uiMessage.toString())
         } else {
             ProfileScreenContent(
                 user = uiState.data,
