@@ -20,6 +20,7 @@
 
     <string name="see_all">See All</string>
     <string name="save">Save</string>
+    <string name="price_updated">Your Price updated</string>
     <string name="filter">Filter</string>
 
     <string name="rational_permissions">"Why Permission "</string>
@@ -62,6 +63,8 @@
     <string name="expertise">Expertise</string>
     <string name="overview">Overview</string>
     <string name="success_register">Thanks for registering. You are now is login.</string>
+    <string name="choose_price_for_every_minute">Specify the price per minute of your consultation</string>
+    <string name="before_schedule_choose_price">Before schedule your times, Specify the price per minute of your consultation</string>
 
     <string name="add_time">Add Time</string>
 

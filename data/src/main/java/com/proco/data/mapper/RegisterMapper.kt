@@ -10,15 +10,16 @@ class RegisterMapper : Mapper<RegisterParam, RegisterRequest> {
             family = from.family,
             email = from.email,
             password = from.password,
-            gender = from.gender.toString(),
-            job =  from.job?.id,
-            expertise = from.expertise?.id,
+            gender = from.gender.toString().uppercase(),
+            job = from.job?.id,
+            expertise = from.expertises?.map { it.id },
             experience = from.experience?.index,
+            education = from.education.toString().uppercase(),
             company = from.company,
             skills = from.skills?.map { it.name },
             bio = from.bio,
             country = from.country?.id,
-            userType = from.userType.toString()
+            userType = from.userType.toString().uppercase()
         )
     }
 }

@@ -42,6 +42,7 @@ import com.proco.extention.baseModifier
 import com.proco.extention.dLog
 import com.proco.extention.toHour
 import com.proco.extention.toInstant
+import com.proco.extention.toLocalDate
 import com.proco.extention.toLocalDateTime
 import com.proco.extention.toMinute
 import com.proco.extention.withColor
@@ -121,13 +122,20 @@ private fun ScheduleScreenContent(
     onSave: () -> Unit
 ) {
 
-    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = Instant.now().toEpochMilli(), yearRange = IntRange(LocalDateTime.now().year , LocalDateTime.now().year))
+    val datePickerState =
+        rememberDatePickerState(initialSelectedDateMillis = Instant.now().toEpochMilli(), yearRange = IntRange(LocalDateTime.now().year, LocalDateTime.now().year))
     val selectedDate: Instant by remember(datePickerState.selectedDateMillis) { mutableStateOf(datePickerState.selectedDateMillis?.toInstant() ?: Instant.now()) }
 
     var isShowTimePicker by remember { mutableStateOf(false) }
 
     val hours =
-        remember(datePickerState.selectedDateMillis, schedules) { derivedStateOf { schedules.find { it.date.toEpochMilli() == datePickerState.selectedDateMillis }?.hours } }
+        remember(datePickerState.selectedDateMillis, schedules) {
+            derivedStateOf {
+                schedules.find {
+                    it.date.compareTo(datePickerState.selectedDateMillis?.toInstant()?.toLocalDate()) == 0
+                }?.hours
+            }
+        }
 
     Column(
         modifier = Modifier

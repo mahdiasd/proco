@@ -6,4 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ScheduleRepository {
     suspend fun saveSchedule(schedule: List<Schedule>): Flow<DataResult<Boolean>>
+    suspend fun getSchedule(id: Int): Flow<DataResult<List<Schedule>>>
 }

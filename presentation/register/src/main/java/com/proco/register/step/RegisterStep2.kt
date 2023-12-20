@@ -2,6 +2,8 @@ package com.proco.register.step
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,6 +28,7 @@ import com.proco.theme.ProcoTheme
 import com.proco.ui.bottom_dialog.ListBottomDialog
 import com.proco.ui.dialog_item.CountryItem
 import com.proco.ui.dialog_item.ExpertiseItem
+import com.proco.ui.dialog_item.ExpertiseListItem
 import com.proco.ui.dialog_item.JobItems
 import com.proco.ui.text.TitleLargeText
 import com.proco.ui.text_field.ProcoTextField
@@ -41,29 +44,32 @@ private fun Preview() {
                 .fillMaxSize()
                 .padding(16.dp),
             job = Job(name = "", expertises = FakeData.expertises()),
-            expertise = Expertise(name = ""),
+            expertises = null,
             country = Country(name = "", code = ""),
             onTyping = { type, text -> },
             onJobTitle = {},
             onCountry = {},
+            onRemoveExpertise = {},
             onExpertise = {}
         )
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RegisterStep2(
     modifier: Modifier,
     allCountries: ImmutableList<Country>? = null,
     allJobs: ImmutableList<Job>? = null,
     job: Job?,
-    expertise: Expertise?,
+    expertises: ImmutableList<Expertise>?,
     country: Country?,
     company: String = "",
     onTyping: (RegisterTypingType, String) -> Unit,
     onJobTitle: (Job) -> Unit,
     onCountry: (Country) -> Unit,
     onExpertise: (Expertise) -> Unit,
+    onRemoveExpertise: (Expertise) -> Unit,
 ) {
     var isShowJobTitleDialog by remember { mutableStateOf(false) }
     var isShowExpertiseDialog by remember { mutableStateOf(false) }
@@ -94,13 +100,26 @@ fun RegisterStep2(
         if (job != null) {
             ProcoTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = expertise?.name ?: "",
+                value = "",
                 onClick = { isShowExpertiseDialog = true },
                 onValueChange = { },
                 hint = stringResource(com.proco.ui.R.string.expertise),
                 enabled = false,
                 icon = com.proco.ui.R.drawable.ic_arrow
             )
+        }
+
+        if (!expertises.isNullOrEmpty()) {
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+                verticalArrangement = Arrangement.Center
+            ) {
+                expertises.forEach {
+                    ExpertiseItem(item = it, onRemove = { onRemoveExpertise(it) })
+                }
+            }
         }
 
         ProcoTextField(
@@ -160,7 +179,7 @@ fun RegisterStep2(
             isShowSearch = false,
             onDismissDialog = { isShowExpertiseDialog = false },
             listItem = { index ->
-                ExpertiseItem(job.expertises[index], onClick = {
+                ExpertiseListItem(job.expertises[index], onClick = {
                     isShowExpertiseDialog = false
                     onExpertise(job.expertises[index])
                 })

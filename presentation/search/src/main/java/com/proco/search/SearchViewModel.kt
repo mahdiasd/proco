@@ -28,7 +28,7 @@ class SearchViewModel @Inject constructor(
                 GetMentorListUseCase.GetMentorListParam(
                     search = currentState.searchText,
                     jobTitle = currentState.userFilter?.job?.name,
-                    country = currentState.userFilter?.country?.code,
+                    country = currentState.userFilter?.country?.name,
                     page = currentState.page
                 )
             ).collect {

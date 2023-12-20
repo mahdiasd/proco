@@ -4,12 +4,14 @@ import androidx.lifecycle.viewModelScope
 import com.proco.base.BaseViewModel
 import com.proco.base.UiMessage
 import com.proco.domain.model.network.DataResult
+import com.proco.domain.model.user.Expertise
 import com.proco.domain.model.user.Skill
 import com.proco.domain.usecase.auth.RegisterUseCase
 import com.proco.domain.usecase.country.GetCountriesUseCase
 import com.proco.domain.usecase.job.GetJobsUseCase
 import com.proco.extention.dLog
 import com.proco.extention.isNull
+import com.proco.extention.safeAdd
 import com.proco.ui.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
@@ -125,17 +127,44 @@ class RegisterViewModel @Inject constructor(
                     setState { currentState.copy(currentStep = event.index) }
             }
 
-            is RegisterUiEvent.OnRegister -> {}
-            is RegisterUiEvent.OnTyping -> onTyping(event.type, event.text)
-            is RegisterUiEvent.OnUserType -> setState { currentState.copy(data = data.copy(userType = event.userType)) }
-            is RegisterUiEvent.OnGender -> setState { currentState.copy(data = data.copy(gender = event.gender)) }
-            is RegisterUiEvent.OnCountry -> setState { currentState.copy(data = data.copy(country = event.country)) }
-            is RegisterUiEvent.OnExperience -> setState { currentState.copy(data = data.copy(experience = event.experience)) }
-            is RegisterUiEvent.OnExpertise -> setState { currentState.copy(data = data.copy(expertise = event.expertise)) }
-            is RegisterUiEvent.OnJobTitle -> setState { currentState.copy(data = data.copy(job = event.job)) }
+            is RegisterUiEvent.OnEducation -> {
+                setState { currentState.copy(data = data.copy(education = event.education)) }
+            }
+
+            is RegisterUiEvent.OnTyping -> {
+                onTyping(event.type, event.text)
+            }
+            is RegisterUiEvent.OnUserType -> {
+                setState { currentState.copy(data = data.copy(userType = event.userType)) }
+            }
+            is RegisterUiEvent.OnGender -> {
+                setState { currentState.copy(data = data.copy(gender = event.gender)) }
+            }
+            is RegisterUiEvent.OnCountry -> {
+                setState { currentState.copy(data = data.copy(country = event.country)) }
+            }
+            is RegisterUiEvent.OnExperience -> {
+                setState { currentState.copy(data = data.copy(experience = event.experience)) }
+            }
+            is RegisterUiEvent.OnExpertise -> {
+                val temp: MutableList<Expertise> = currentState.data.expertises?.toMutableList() ?: mutableListOf()
+                temp.takeIf { currentState.data.expertises?.firstOrNull { it.id == event.expertise.id } == null }.also {
+                    setState { currentState.copy(data = data.copy(expertises = temp.safeAdd(event.expertise).toImmutableList())) }
+                }
+            }
+
+            is RegisterUiEvent.OnRemoveExpertise -> {
+                val temp: MutableList<Expertise> = currentState.data.expertises?.toMutableList() ?: mutableListOf()
+                temp.remove(event.expertise)
+                setState { currentState.copy(data = data.copy(expertises = temp.toImmutableList())) }
+            }
+
+            is RegisterUiEvent.OnJobTitle -> {
+                setState { currentState.copy(data = data.copy(job = event.job)) }
+            }
             is RegisterUiEvent.OnAddSkill -> {
                 val temp: MutableList<Skill> = currentState.data.skills?.toMutableList() ?: mutableListOf()
-                temp.add(event.skill)
+                temp.safeAdd(event.skill)
                 setState { currentState.copy(data = data.copy(skills = temp.toImmutableList())) }
             }
 

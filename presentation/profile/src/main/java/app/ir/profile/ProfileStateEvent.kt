@@ -14,11 +14,13 @@ data class ProfileViewState(
     override val data: User? = null,
     override val uiMessage: UiMessage? = null,
     val profileType: ProfileType,
-    val schedule: ImmutableList<Schedule>? = null
+    val schedule: ImmutableList<Schedule>? = null,
+    val savePriceLoading: Boolean? = null,
 ) : BaseUiState<User>
 
 
 sealed class ProfileViewEvent : UiEvent {
+    data class OnChangePrice(val price: Int) : ProfileViewEvent()
 }
 
 

@@ -47,24 +47,24 @@ sealed class SnackType {
 
 
 @Composable
-fun SuccessSnackBar(messageInt: Int, hasNotch: Boolean = com.proco.extention.hasNotch(), duration: Long = 3500L, finished: (() -> Unit)? = null) {
+fun SuccessSnackBar(messageInt: Int, hasNotch: Boolean = com.proco.extention.hasNotch(), duration: Long = 6000L, finished: (() -> Unit)? = null) {
     ShowSnackBar(message = stringResource(id = messageInt), color = green, duration = duration, hasNotch = hasNotch, finished = finished)
 }
 
 @Composable
-fun SuccessSnackBar(messageText: String?, hasNotch: Boolean = com.proco.extention.hasNotch(), duration: Long = 3500L, finished: (() -> Unit)? = null) {
+fun SuccessSnackBar(messageText: String?, hasNotch: Boolean = com.proco.extention.hasNotch(), duration: Long = 6000L, finished: (() -> Unit)? = null) {
     if (messageText.isNullOrEmpty()) return
     ShowSnackBar(message = messageText, duration = duration, color = green, hasNotch = hasNotch, finished = finished)
 }
 
 @Composable
-fun FailedSnackBar(messageText: String?, hasNotch: Boolean = com.proco.extention.hasNotch(), duration: Long = 3500L, finished: (() -> Unit)? = null) {
+fun FailedSnackBar(messageText: String?, hasNotch: Boolean = com.proco.extention.hasNotch(), duration: Long = 6000L, finished: (() -> Unit)? = null) {
     if (messageText.isNullOrEmpty()) return
     ShowSnackBar(message = messageText, duration = duration, hasNotch = hasNotch, color = red, finished = finished)
 }
 
 @Composable
-fun FailedSnackBar(messageInt: Int, hasNotch: Boolean = com.proco.extention.hasNotch(), duration: Long = 3500L, finished: (() -> Unit)? = null) {
+fun FailedSnackBar(messageInt: Int, hasNotch: Boolean = com.proco.extention.hasNotch(), duration: Long = 6000L, finished: (() -> Unit)? = null) {
     ShowSnackBar(message = stringResource(id = messageInt), duration = duration, hasNotch = hasNotch, finished = finished)
 }
 
@@ -73,7 +73,7 @@ fun FailedSnackBar(messageInt: Int, hasNotch: Boolean = com.proco.extention.hasN
 private fun ShowSnackBar(
     message: String,
     hasNotch: Boolean = com.proco.extention.hasNotch(),
-    duration: Long = 3500L,
+    duration: Long = 6000L,
     color: Color = green,
     finished: (() -> Unit)? = null,
 ) {

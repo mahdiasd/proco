@@ -3,6 +3,7 @@ package com.proco.domain.usecase.auth
 import androidx.compose.runtime.Stable
 import com.proco.domain.fake_data.FakeData
 import com.proco.domain.model.user.Country
+import com.proco.domain.model.user.Education
 import com.proco.domain.model.user.Experience
 import com.proco.domain.model.user.Expertise
 import com.proco.domain.model.user.Gender
@@ -22,7 +23,8 @@ data class RegisterParam(
     val password: String = "12345678",
     val gender: Gender? = Gender.Male,
     val job: Job? = null,
-    val expertise: Expertise? = null,
+    val education: Education? = null,
+    val expertises: ImmutableList<Expertise>? = null,
     val experience: Experience? = null,
     val company: String = "Manshour Fanavari",
     val skills: ImmutableList<Skill>? = FakeData.skills().take(4).toImmutableList(),

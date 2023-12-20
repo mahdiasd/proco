@@ -35,15 +35,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.proco.domain.fake_data.FakeData
+import com.proco.domain.model.user.Education
 import com.proco.domain.model.user.Experience
 import com.proco.domain.model.user.Skill
 import com.proco.extention.animateClickable
 import com.proco.extention.blackOrWhite
+import com.proco.extention.capitalizeFirstChar
 import com.proco.extention.coloredShadow
 import com.proco.extention.withColor
 import com.proco.register.RegisterTypingType
 import com.proco.ui.R
 import com.proco.ui.bottom_dialog.ListBottomDialog
+import com.proco.ui.dialog_item.EducationItem
 import com.proco.ui.dialog_item.ExperienceItem
 import com.proco.ui.text.BodyLargeText
 import com.proco.ui.text.BodyMediumText
@@ -63,7 +66,8 @@ private fun Preview() {
         experience = null,
         onExperience = {},
         onAddSkill = {},
-        onRemoveSkill = {}
+        onRemoveSkill = {},
+        onEducation = {},
     )
 }
 
@@ -77,12 +81,16 @@ fun RegisterStep3(
     onTyping: (RegisterTypingType, String) -> Unit,
     experience: Experience?,
     onExperience: (Experience) -> Unit,
+    education: Education? = null,
+    onEducation: (Education) -> Unit,
     onAddSkill: (Skill) -> Unit,
     onRemoveSkill: (Skill) -> Unit,
 ) {
     var skill by remember { mutableStateOf("") }
     var isShowExperienceDialog by remember { mutableStateOf(false) }
+    var isShowEducationDialog by remember { mutableStateOf(false) }
     val experienceList = remember { mutableStateListOf(Experience.Junior, Experience.Mid, Experience.Senior, Experience.Expert) }
+    val educationList = remember { mutableStateListOf(Education.Diploma, Education.AssociateDegree, Education.BachelorsDegree, Education.MastersDegree, Education.PhdDegree) }
 
     val suggestSkills by remember(skill) {
         derivedStateOf {
@@ -127,12 +135,20 @@ fun RegisterStep3(
             }
         }
 
-
-
         ProcoTextField(
             modifier = Modifier.fillMaxWidth(),
             onClick = { isShowExperienceDialog = true },
             value = experience?.title?.let { "$it ${stringResource(id = R.string.year)}" } ?: "",
+            onValueChange = { },
+            hint = stringResource(R.string.experience),
+            enabled = false,
+            icon = R.drawable.ic_arrow
+        )
+
+        ProcoTextField(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { isShowEducationDialog = true },
+            value = education?.toString()?.capitalizeFirstChar() ?: "",
             onValueChange = { },
             hint = stringResource(R.string.experience),
             enabled = false,
@@ -188,6 +204,20 @@ fun RegisterStep3(
                 ExperienceItem(experienceList[index], onClick = {
                     isShowExperienceDialog = false
                     onExperience(experienceList[index])
+                })
+            }
+        )
+    }
+    if (isShowEducationDialog) {
+        ListBottomDialog(
+            modifier = Modifier.fillMaxWidth(),
+            listSize = experienceList.size,
+            isShowSearch = false,
+            onDismissDialog = { isShowEducationDialog = false },
+            listItem = { index ->
+                EducationItem(educationList[index], onClick = {
+                    isShowEducationDialog = false
+                    onEducation(educationList[index])
                 })
             }
         )

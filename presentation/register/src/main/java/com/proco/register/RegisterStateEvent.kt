@@ -5,6 +5,7 @@ import com.proco.base.UiEvent
 import com.proco.base.UiMessage
 import com.proco.base.UiState
 import com.proco.domain.model.user.Country
+import com.proco.domain.model.user.Education
 import com.proco.domain.model.user.Experience
 import com.proco.domain.model.user.Expertise
 import com.proco.domain.model.user.Gender
@@ -27,16 +28,17 @@ data class RegisterUiState(
 ) : UiState
 
 sealed class RegisterUiEvent : UiEvent {
-    data object OnRegister : RegisterUiEvent()
     data class OnTyping(val type: RegisterTypingType, val text: String) : RegisterUiEvent()
     data class OnUserType(val userType: UserType) : RegisterUiEvent()
     data class OnGender(val gender: Gender) : RegisterUiEvent()
     data class OnNextStep(val index: Int) : RegisterUiEvent()
     data class OnExpertise(val expertise: Expertise) : RegisterUiEvent()
+    data class OnRemoveExpertise(val expertise: Expertise) : RegisterUiEvent()
     data class OnExperience(val experience: Experience) : RegisterUiEvent()
     data class OnJobTitle(val job: Job) : RegisterUiEvent()
     data class OnAddSkill(val skill: Skill) : RegisterUiEvent()
     data class OnRemoveSkill(val skill: Skill) : RegisterUiEvent()
+    data class OnEducation(val education: Education) : RegisterUiEvent()
     data class OnCountry(val country: Country) : RegisterUiEvent()
 }
 

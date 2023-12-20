@@ -9,7 +9,7 @@ enum class Gender {
     NonBinary;
 
     override fun toString(): String {
-        return super.name.lowercase()
+        return super.name.uppercase()
     }
 
 }

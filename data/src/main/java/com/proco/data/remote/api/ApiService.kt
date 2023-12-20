@@ -12,6 +12,7 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface ApiService {
 
@@ -22,14 +23,18 @@ interface ApiService {
     @POST
     suspend fun saveSchedule(@Body scheduleDto: List<ScheduleDto>): NetworkResponse<Boolean>
 
-    @POST
-    @FormUrlEncoded
+    @GET("/user/mentors")
     suspend fun getUsers(
-        @Field("search") search: String? = null,
-        @Field("job_title") jobTitle: String? = null,
-        @Field("country") country: String? = null,
-        @Field("page") page: Int? = null,
+        @Query("name") name: String? = null,
+        @Query("job") jobTitle: String? = null,
+        @Query("country") country: String? = null,
+        @Query("page") page: Int? = null,
     ): NetworkResponse<List<User>>
+
+    @GET("/user/schedule")
+    suspend fun getSchedule(
+        @Query("id") id: Int,
+    ): NetworkResponse<List<ScheduleDto>>
 
     @POST
     @FormUrlEncoded
@@ -39,6 +44,10 @@ interface ApiService {
 
     @POST("/auth/register")
     suspend fun register(@Body registerParam: RegisterRequest): NetworkResponse<User>
+
+    @POST("/user/update")
+    @FormUrlEncoded
+    suspend fun updatePrice(@Field("price") price: Int): NetworkResponse<User>
 
     @GET("/country")
     suspend fun getCountries(): NetworkResponse<List<Country>>

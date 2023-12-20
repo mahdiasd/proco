@@ -40,6 +40,7 @@ import kotlinx.collections.immutable.toImmutableList
 private fun Preview() {
     ProcoTheme {
         SearchScreenContent(
+            users = FakeData.users().toImmutableList(),
             onFilter = { },
             onItemClick = { }
         )
@@ -49,8 +50,9 @@ private fun Preview() {
 @Preview(showBackground = true)
 @Composable
 private fun DarkPreview() {
-    ProcoTheme(true) {
+    ProcoTheme(darkTheme = true) {
         SearchScreenContent(
+            users = FakeData.users().toImmutableList(),
             onFilter = { },
             onItemClick = { }
         )
@@ -69,9 +71,10 @@ fun SearchScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
-        uiMessage = null
+        uiMessage = uiState.uiMessage
     ) {
         SearchScreenContent(
+            users = uiState.data,
             onFilter = onFilter,
             onItemClick = onItemClick
         )
@@ -82,7 +85,7 @@ fun SearchScreen(
 
 @Composable
 private fun SearchScreenContent(
-    users: ImmutableList<User> = FakeData.users().toImmutableList(),
+    users: ImmutableList<User>?,
     searchText: String = "",
     onSearchChanged: (String) -> Unit = {},
     onRefresh: () -> Unit = {},
@@ -145,11 +148,12 @@ private fun SearchScreenContent(
                 .padding(horizontal = 16.dp),
             isRefreshing = isRefreshing,
             isLoadMore = isLoadMore,
-            listSize = users.size,
+            listSize = users?.size,
             onRefresh = onRefresh,
             onLoadMore = onLoadMore,
         ) { index ->
-            MentorItem(users[index], onClick = onItemClick)
+            if (users != null)
+                MentorItem(users[index], onClick = onItemClick)
         }
     }
 }

@@ -19,5 +19,4 @@ class TimeExtensionTest {
         assertTrue(instant.toLocalDateTime().hour == time.hour)
         assertTrue(instant.toLocalDateTime().minute == time.minute)
     }
-
 }

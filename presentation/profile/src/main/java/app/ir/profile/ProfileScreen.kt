@@ -38,11 +38,14 @@ import coil.compose.AsyncImage
 import com.proco.base.BaseScreen
 import com.proco.domain.fake_data.FakeData
 import com.proco.domain.model.user.User
+import com.proco.extention.animateClickable
+import com.proco.extention.baseModifier
 import com.proco.extention.coilCircle
 import com.proco.theme.ProcoTheme
 import com.proco.ui.R
 import com.proco.ui.button.ProcoButton
 import com.proco.ui.dash_line.HorizontalDashLine
+import com.proco.ui.dialog_item.PriceDialog
 import com.proco.ui.error.ErrorScreen
 import com.proco.ui.loading.LoadingScreen
 import com.proco.ui.spacer.CustomSpacer
@@ -59,7 +62,22 @@ private fun Preview() {
             onBooking = { },
             onEdit = { },
             user = FakeData.user(),
-            profileType = ProfileType.Self
+            profileType = ProfileType.Self,
+            onPrice = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DarkPreview() {
+    ProcoTheme(darkTheme = true) {
+        ProfileScreenContent(
+            onBooking = { },
+            onEdit = { },
+            user = FakeData.user(),
+            profileType = ProfileType.Public,
+            onPrice = {}
         )
     }
 }
@@ -73,10 +91,8 @@ fun ProfileScreen(
     val uiState = vm.uiState.collectAsState().value
 
     BaseScreen(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        uiMessage = null
+        modifier = Modifier.baseModifier(),
+        uiMessage = uiState.uiMessage
     ) {
 
         if (uiState.isLoading) {
@@ -88,7 +104,8 @@ fun ProfileScreen(
                 user = uiState.data,
                 onBooking = onBooking,
                 onEdit = onEdit,
-                profileType = uiState.profileType
+                profileType = uiState.profileType,
+                onPrice = { vm.onTriggerEvent(ProfileViewEvent.OnChangePrice(it)) }
             )
         }
 
@@ -106,9 +123,12 @@ private fun ProfileScreenContent(
     user: User,
     profileType: ProfileType,
     onBooking: () -> Unit,
-    onEdit: () -> Unit
+    onEdit: () -> Unit,
+    onPrice: (Int) -> Unit,
+    savePriceLoading: Boolean? = null,
 ) {
     var profileTab: ProfileTab by remember { mutableStateOf(ProfileTab.Bio) }
+    var isShowPriceDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -126,10 +146,13 @@ private fun ProfileScreenContent(
         ) {
             AsyncImage(
                 modifier = Modifier.size(80.dp),
-                model = coilCircle(data = user.avatar.ifEmpty { R.drawable.ic_placeholer_avatar }), contentDescription = "user avatar"
+                model = coilCircle(data = user.avatar.ifEmpty { R.drawable.ic_placeholer_avatar }),
+                contentDescription = "user avatar"
             )
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -137,10 +160,37 @@ private fun ProfileScreenContent(
                 BodyMediumText(text = "Android Developer")
             }
 
-            Icon(
-                modifier = Modifier.size(32.dp),
-                painter = painterResource(id = R.drawable.ic_edit), contentDescription = "Edit"
-            )
+            when (profileType) {
+                ProfileType.Public -> {
+
+                }
+
+                ProfileType.Self -> {
+                    Column(
+                        modifier = Modifier,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .padding(6.dp),
+                            painter = painterResource(id = R.drawable.ic_edit),
+                            contentDescription = "Edit",
+                            tint = MaterialTheme.colorScheme.surface
+                        )
+                        Icon(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .animateClickable { isShowPriceDialog = true }
+                                .padding(6.dp),
+                            painter = painterResource(id = R.drawable.ic_dollar),
+                            contentDescription = "Edit",
+                            tint = MaterialTheme.colorScheme.surface
+                        )
+                    }
+                }
+            }
         }
 
         HorizontalDashLine(modifier = Modifier.fillMaxWidth())
@@ -208,10 +258,20 @@ private fun ProfileScreenContent(
         if (profileType == ProfileType.Public)
             ProcoButton(text = stringResource(id = R.string.booking), onClick = {})
 
+        if (isShowPriceDialog) {
+            if (savePriceLoading == false) {
+                isShowPriceDialog = false
+            } else {
+                PriceDialog(onPrice = onPrice, onDismiss = { isShowPriceDialog = false }, isLoading = savePriceLoading ?: false)
+            }
+        }
+
+
     }
 
 
 }
+
 
 @Composable
 private fun ScheduleScreen(user: User) {

@@ -4,6 +4,7 @@ import com.proco.data.mapper.RegisterMapper
 import com.proco.data.remote.api.ApiService
 import com.proco.data.remote.utils.safeCall
 import com.proco.domain.model.network.DataResult
+import com.proco.domain.model.user.User
 import com.proco.domain.repository.UserRepository
 import com.proco.domain.usecase.auth.RegisterParam
 import kotlinx.coroutines.flow.Flow
@@ -40,6 +41,14 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun register(registerParam: RegisterParam) = flow {
         emit(safeCall { apiService.register(registerMapper.mapFrom(registerParam)) })
+    }
+
+    override suspend fun updatePrice(price: Int) = flow<DataResult<User>> {
+        emit(safeCall { apiService.updatePrice(price) })
+    }
+
+    override suspend fun updateUser(user: User): Flow<DataResult<User>> {
+        TODO("Not yet implemented")
     }
 
 

@@ -9,8 +9,4 @@ import kotlinx.serialization.Serializable
 sealed class UserType {
     data object Mentee : UserType()
     data object Mentor : UserType()
-
-    override fun toString(): String {
-        return super.toString().lowercase()
-    }
 }

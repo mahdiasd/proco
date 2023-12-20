@@ -60,3 +60,11 @@ fun <T> MutableList<T>?.safeAdd(element: T): MutableList<T> {
     }
     return this
 }
+
+fun String?.capitalizeFirstChar(): String {
+    return if (!this.isNullOrEmpty()) {
+        this.substring(0, 1).uppercase() + this.substring(1).lowercase()
+    } else {
+        ""
+    }
+}

@@ -13,15 +13,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.proco.base.BaseScreen
 import com.proco.domain.model.user.Country
+import com.proco.domain.model.user.Education
 import com.proco.domain.model.user.Experience
 import com.proco.domain.model.user.Expertise
 import com.proco.domain.model.user.Gender
@@ -59,16 +58,15 @@ private fun RegisterScreenPreview() {
         allJobs = null,
         allSkills = null,
         onAddSkill = {},
-        onRemoveSkill = {}
+        onRemoveSkill = {},
+        onRemoveExpertise = {},
+        onEducation = {}
     )
 }
 
 @Composable
 fun RegisterScreen(vm: RegisterViewModel = hiltViewModel(), onRegister: () -> Unit) {
-    val context = LocalContext.current
     val uiState = vm.uiState.collectAsState().value
-    var errorMessage by remember { mutableStateOf("") }
-
     val onTyping = remember<((RegisterTypingType, String) -> Unit)> {
         { type, text ->
             vm.onTriggerEvent(RegisterUiEvent.OnTyping(type, text))
@@ -103,10 +101,12 @@ fun RegisterScreen(vm: RegisterViewModel = hiltViewModel(), onRegister: () -> Un
             onExperience = { vm.onTriggerEvent(RegisterUiEvent.OnExperience(it)) },
             onCountry = { vm.onTriggerEvent(RegisterUiEvent.OnCountry(it)) },
             onExpertise = { vm.onTriggerEvent(RegisterUiEvent.OnExpertise(it)) },
+            onRemoveExpertise = { vm.onTriggerEvent(RegisterUiEvent.OnRemoveExpertise(it)) },
             onJobTitle = { vm.onTriggerEvent(RegisterUiEvent.OnJobTitle(it)) },
             onRegister = onRegister,
             onAddSkill = { vm.onTriggerEvent(RegisterUiEvent.OnAddSkill(it)) },
-            onRemoveSkill = { vm.onTriggerEvent(RegisterUiEvent.OnRemoveSkill(it)) }
+            onRemoveSkill = { vm.onTriggerEvent(RegisterUiEvent.OnRemoveSkill(it)) },
+            onEducation = { vm.onTriggerEvent(RegisterUiEvent.OnEducation(it)) }
         )
     }
 }
@@ -121,6 +121,7 @@ private fun RegisterScreenContent(
     onUserType: (UserType) -> Unit,
     onGender: (Gender) -> Unit,
     onExpertise: (Expertise) -> Unit,
+    onRemoveExpertise: (Expertise) -> Unit,
     onCountry: (Country) -> Unit,
     onJobTitle: (Job) -> Unit,
     onExperience: (Experience) -> Unit,
@@ -131,8 +132,9 @@ private fun RegisterScreenContent(
     allCountries: ImmutableList<Country>?,
     onAddSkill: (Skill) -> Unit,
     onRemoveSkill: (Skill) -> Unit,
+    onEducation: (Education) -> Unit,
 
-) {
+    ) {
 
     val userType by remember(registerParam.userType) { mutableStateOf(registerParam.userType) }
     val name by remember(registerParam.name) { mutableStateOf(registerParam.name) }
@@ -192,13 +194,14 @@ private fun RegisterScreenContent(
                     allCountries = allCountries,
                     allJobs = allJobs,
                     job = registerParam.job,
-                    expertise = registerParam.expertise,
+                    expertises = registerParam.expertises,
                     country = registerParam.country,
                     company = registerParam.company,
                     onTyping = onTyping,
                     onExpertise = onExpertise,
                     onCountry = onCountry,
-                    onJobTitle = onJobTitle
+                    onJobTitle = onJobTitle,
+                    onRemoveExpertise = onRemoveExpertise
                 )
             }
 
@@ -215,7 +218,9 @@ private fun RegisterScreenContent(
                     onTyping = onTyping,
                     onExperience = onExperience,
                     onAddSkill = onAddSkill,
-                    onRemoveSkill =onRemoveSkill
+                    onRemoveSkill = onRemoveSkill,
+                    education = registerParam.education,
+                    onEducation = onEducation
                 )
             }
         }

@@ -16,6 +16,7 @@ data class User(
     val company: String,
     val skills: ImmutableList<Skill>? = null,
     val bio: String?,
+    val price: Int?,
     val country: Country?,
 ) {
     fun getFullName(): String {

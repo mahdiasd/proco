@@ -13,9 +13,11 @@ data class RegisterRequest(
     val family: String = "",
     val email: String = "",
     val password: String = "",
+    @SerialName("sex")
     val gender: String,
+    val education: String,
     val job: Int?,
-    val expertise: Int?,
+    val expertise: List<Int>?,
     val experience: Int? = null,
     val company: String? = null,
     val skills: List<String>?,

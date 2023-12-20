@@ -10,4 +10,6 @@ interface UserRepository {
     suspend fun getUsers(search: String? = null, jobTitle: String? = null, country: String? = null, page: Int): Flow<DataResult<List<User>>>
     suspend fun getUser(id: Int): Flow<DataResult<User>>
     suspend fun register(registerParam: RegisterParam): Flow<DataResult<User>>
+    suspend fun updatePrice(price: Int): Flow<DataResult<User>>
+    suspend fun updateUser(user: User): Flow<DataResult<User>>
 }

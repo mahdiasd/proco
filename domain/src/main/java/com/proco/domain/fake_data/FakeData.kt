@@ -38,7 +38,8 @@ object FakeData {
             company = "",
             skills = listOf(Skill(name = "#android")).toImmutableList(),
             bio = "Experienced Android developer with over 5 years building and deploying apps to the Google Play Store. Skilled in Java, Kotlin, XML, Firebase, REST APIs, SQLite databases, and Material Design. Passionate about turning ideas into performant, beautiful mobile apps that delight users. Built messaging, weather, sports, and location-based apps each with over 100k downloads. Excited to join a fast-paced team to continue creating meaningful impacts in people's lives through mobile technology. Constantly learning and staying on top of latest Android advancements.",
-            country = Country(code = "IR", name = "Iran")
+            country = Country(code = "IR", name = "Iran"),
+            price = 1
         )
 
     }

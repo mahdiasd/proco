@@ -4,9 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.proco.base.BaseViewModel
 import com.proco.base.UiMessage
+import com.proco.base.UiMessageType
 import com.proco.domain.fake_data.FakeData
 import com.proco.domain.model.network.DataResult
 import com.proco.domain.usecase.user.GetUserUseCase
+import com.proco.domain.usecase.user.UpdatePriceUseCase
+import com.proco.ui.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -14,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
+    private val updatePriceUseCase: UpdatePriceUseCase,
     private val savedStateHandle: SavedStateHandle?
 ) : BaseViewModel<ProfileViewState, ProfileViewEvent>() {
     private var userId: Int? = null
@@ -55,6 +59,27 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    private fun updatePrice(price: Int) {
+        setState { currentState.copy(savePriceLoading = true, uiMessage = null) }
+        viewModelScope.launch {
+            updatePriceUseCase.executeSync(price).collect {
+                when (it) {
+                    is DataResult.Failure -> {
+                        setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
+                    }
+                    is DataResult.Success -> {
+                        setState {
+                            currentState.copy(
+                                savePriceLoading = false,
+                                uiMessage = UiMessage.System(R.string.price_updated, UiMessageType.Success)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     override fun createInitialState(): ProfileViewState {
         userId = savedStateHandle?.get("id")
@@ -62,6 +87,11 @@ class ProfileViewModel @Inject constructor(
     }
 
     override fun onTriggerEvent(event: ProfileViewEvent) {
+        when (event) {
+            is ProfileViewEvent.OnChangePrice -> {
+                updatePrice(event.price)
+            }
+        }
     }
 
 

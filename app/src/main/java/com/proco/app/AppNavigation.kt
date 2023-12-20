@@ -8,7 +8,6 @@ import app.ir.main.navigation.mainScreen
 import app.ir.profile.navigation.ProfileScreenCompose
 import com.proco.filter.navigation.filterRoute
 import com.proco.filter.navigation.filterScreen
-import com.proco.login.navigation.loginRoute
 import com.proco.login.navigation.loginScreen
 import com.proco.register.navigation.registerRoute
 import com.proco.register.navigation.registerScreen
@@ -20,7 +19,7 @@ import com.proco.search.navigation.SearchScreenCompose
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = loginRoute) {
+    NavHost(navController = navController, startDestination = mainRoute) {
         loginScreen(
             onRegister = {
                 navController.navigate(registerRoute)

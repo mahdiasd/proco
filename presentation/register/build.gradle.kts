@@ -51,7 +51,17 @@ dependencies {
     implementation(libs.dagger.hilt.navigation)
     ksp(libs.dagger.hilt.compiler)
 
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+    /*--------------------- Tests -------------------------------*/
+    testApi(libs.mockito.kotlin)
+    testApi(libs.kotlinx.coroutines.test)
+    androidTestApi(libs.dagger.hilt.android.testing)
+    kspAndroidTest(libs.dagger.hilt.android.compiler)
+    kspAndroidTest(libs.dagger.hilt.android.testing)
+    testApi(libs.junit)
+    androidTestApi(libs.ui.test.junit4)
+    androidTestApi(libs.androidx.test.ext.junit)
+    androidTestApi(libs.espresso.core)
+    androidTestApi(platform(libs.compose.bom))
+    debugApi(libs.ui.tooling)
+    debugApi(libs.ui.test.manifest)
 }

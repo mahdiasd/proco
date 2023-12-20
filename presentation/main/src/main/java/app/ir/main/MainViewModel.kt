@@ -24,7 +24,7 @@ class MainViewModel @Inject constructor(
             getUseCase.executeSync(GetUserUseCase.DataSourceType.Local).collect {
 //                setState { currentState.copy(user = it) }
                 // TODO: replaced real data with this line
-                setState { currentState.copy(user = FakeData.user().copy(type = UserType.Mentee)) }
+                setState { currentState.copy(user = FakeData.user().copy(type = UserType.Mentor)) }
             }
         }
     }

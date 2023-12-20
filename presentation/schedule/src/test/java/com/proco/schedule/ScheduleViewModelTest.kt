@@ -1,39 +1,62 @@
 package com.proco.schedule
 
-import androidx.compose.runtime.mutableStateListOf
 import com.proco.domain.model.schedule.HourRange
 import com.proco.domain.model.schedule.Schedule
-import com.proco.domain.usecase.ScheduleUseCase
+import com.proco.domain.usecase.schedule.SaveScheduleUseCase
+import com.proco.extention.toLocalDate
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
 import java.time.Instant
 
+@OptIn(ExperimentalCoroutinesApi::class)
+
 class ScheduleViewModelTest {
-    var scheduleUseCase: ScheduleUseCase = mock()
-    var vm: ScheduleViewModel = ScheduleViewModel(scheduleUseCase)
+    private var saveScheduleUseCase: SaveScheduleUseCase = mock()
+
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
+
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(mainThreadSurrogate)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain() // reset the main dispatcher to the original Main dispatcher
+        mainThreadSurrogate.close()
+    }
 
     @Test
-    fun `remove hour from schedule`() {
+    fun `remove hour from schedule`() = runBlocking {
+        val vm = ScheduleViewModel(saveScheduleUseCase)
 
         // Test data
         val date = Instant.now()
         val hourRangeToRemove = HourRange(Instant.MIN, Instant.MAX)
-        val schedule = Schedule(date, listOf(hourRangeToRemove).toImmutableList())
-        val localSchedule = mutableStateListOf(schedule)
-        // Set up view model
+        val schedule = Schedule(date.toLocalDate(), listOf(hourRangeToRemove).toImmutableList())
 
-        // Set initial state
-        vm.setState { vm.currentState.copy(localSchedule = localSchedule) }
+        vm.onTriggerEvent(ScheduleUiEvent.OnAddHour(date, hourRangeToRemove))
 
         // Verify initial state
-        assertTrue(vm.currentState.localSchedule == localSchedule)
+        assertTrue(vm.currentState.localSchedule.size == 1)
 
         // Trigger remove hour event
         vm.onTriggerEvent(ScheduleUiEvent.OnRemoveHour(date, hourRangeToRemove))
 
         // Verify hour was removed
-        assertTrue(vm.currentState.localSchedule[0].hours.size == 0)
+        assertTrue(vm.currentState.localSchedule.size == 0)
     }
 }
