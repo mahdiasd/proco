@@ -1,16 +1,25 @@
 package app.ir.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clipScrollableContainer
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -37,32 +46,38 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.proco.base.BaseScreen
 import com.proco.domain.fake_data.FakeData
+import com.proco.domain.model.schedule.Schedule
 import com.proco.domain.model.user.User
 import com.proco.extention.animateClickable
 import com.proco.extention.baseModifier
 import com.proco.extention.coilCircle
 import com.proco.theme.ProcoTheme
+import com.proco.theme.white
 import com.proco.ui.R
 import com.proco.ui.button.ProcoButton
-import com.proco.ui.dash_line.HorizontalDashLine
 import com.proco.ui.dialog_item.PriceDialog
 import com.proco.ui.error.ErrorScreen
+import com.proco.ui.hour_range.HourRangeItem
 import com.proco.ui.loading.LoadingScreen
 import com.proco.ui.spacer.CustomSpacer
 import com.proco.ui.text.BodyLargeText
 import com.proco.ui.text.BodyMediumText
-import com.proco.ui.text.TitleLargeText
+import com.proco.ui.text.TitleMediumText
 import com.proco.ui.text_field.ProcoTextField
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
+import java.time.LocalDate
 
 @Preview(showBackground = true)
 @Composable
-private fun Preview() {
-    ProcoTheme {
+private fun Preview(darkTheme: Boolean = false) {
+    ProcoTheme(darkTheme = darkTheme) {
         ProfileScreenContent(
             onBooking = { },
             onEdit = { },
             user = FakeData.user(),
             profileType = ProfileType.Self,
+            schedules = null,
             onPrice = {}
         )
     }
@@ -71,15 +86,7 @@ private fun Preview() {
 @Preview(showBackground = true)
 @Composable
 private fun DarkPreview() {
-    ProcoTheme(darkTheme = true) {
-        ProfileScreenContent(
-            onBooking = { },
-            onEdit = { },
-            user = FakeData.user(),
-            profileType = ProfileType.Public,
-            onPrice = {}
-        )
-    }
+    Preview(true)
 }
 
 @Composable
@@ -105,6 +112,8 @@ fun ProfileScreen(
                 onBooking = onBooking,
                 onEdit = onEdit,
                 profileType = uiState.profileType,
+                savePriceLoading = uiState.savePriceLoading,
+                schedules = uiState.schedule,
                 onPrice = { vm.onTriggerEvent(ProfileViewEvent.OnChangePrice(it)) }
             )
         }
@@ -121,34 +130,47 @@ private sealed class ProfileTab(val index: Int) {
 @Composable
 private fun ProfileScreenContent(
     user: User,
+    schedules: ImmutableList<Schedule>?,
     profileType: ProfileType,
     onBooking: () -> Unit,
     onEdit: () -> Unit,
     onPrice: (Int) -> Unit,
     savePriceLoading: Boolean? = null,
 ) {
-    var profileTab: ProfileTab by remember { mutableStateOf(ProfileTab.Bio) }
+    var profileTab: ProfileTab by remember { mutableStateOf(ProfileTab.Schedule) }
     var isShowPriceDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .safeDrawingPadding()
-            .padding(horizontal = 24.dp),
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            AsyncImage(
-                modifier = Modifier.size(80.dp),
-                model = coilCircle(data = user.avatar.ifEmpty { R.drawable.ic_placeholer_avatar }),
-                contentDescription = "user avatar"
-            )
+            Box {
+                AsyncImage(
+                    modifier = Modifier.size(80.dp),
+                    model = coilCircle(data = user.avatar.ifEmpty { R.drawable.ic_placeholer_avatar }),
+                    contentDescription = "user avatar"
+                )
+                Icon(
+                    modifier = Modifier
+                        .align(alignment = Alignment.BottomEnd)
+                        .background(MaterialTheme.colorScheme.secondary, CircleShape)
+                        .size(32.dp)
+                        .padding(8.dp),
+                    painter = painterResource(id = R.drawable.ic_edit),
+                    contentDescription = "Edit",
+                    tint = MaterialTheme.colorScheme.surface
+                )
+            }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -160,40 +182,31 @@ private fun ProfileScreenContent(
                 BodyMediumText(text = "Android Developer")
             }
 
-            when (profileType) {
-                ProfileType.Public -> {
-
-                }
-
-                ProfileType.Self -> {
-                    Column(
-                        modifier = Modifier,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .padding(6.dp),
-                            painter = painterResource(id = R.drawable.ic_edit),
-                            contentDescription = "Edit",
-                            tint = MaterialTheme.colorScheme.surface
-                        )
-                        Icon(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .animateClickable { isShowPriceDialog = true }
-                                .padding(6.dp),
-                            painter = painterResource(id = R.drawable.ic_dollar),
-                            contentDescription = "Edit",
-                            tint = MaterialTheme.colorScheme.surface
-                        )
-                    }
-                }
+            if (user.price == null && profileType == ProfileType.Self) {
+                Icon(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .animateClickable { isShowPriceDialog = true }
+                        .padding(6.dp),
+                    painter = painterResource(id = R.drawable.ic_dollar),
+                    contentDescription = "Edit",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            } else {
+                BodyLargeText(
+                    modifier = Modifier
+                        .size(40.dp, 40.dp)
+                        .animateClickable { isShowPriceDialog = true }
+                        .background(MaterialTheme.colorScheme.primary, CircleShape)
+                        .padding(8.dp),
+                    text = "${user.price} $",
+                    color = white,
+                    textAlign = TextAlign.Center
+                )
             }
         }
 
-        HorizontalDashLine(modifier = Modifier.fillMaxWidth())
+//        HorizontalDashLine(modifier = Modifier.fillMaxWidth())
 
         TabRow(
             modifier = Modifier.fillMaxWidth(),
@@ -210,7 +223,7 @@ private fun ProfileScreenContent(
             }
         ) {
             Tab(selected = true, onClick = { profileTab = ProfileTab.Bio }, text = {
-                TitleLargeText(
+                TitleMediumText(
                     modifier = Modifier
                         .padding(vertical = 4.dp, horizontal = 8.dp),
                     text = stringResource(id = R.string.bio),
@@ -219,7 +232,7 @@ private fun ProfileScreenContent(
             })
 
             Tab(selected = false, onClick = { profileTab = ProfileTab.Overview }) {
-                TitleLargeText(
+                TitleMediumText(
                     modifier = Modifier
                         .padding(vertical = 4.dp, horizontal = 8.dp),
                     text = stringResource(id = R.string.overview),
@@ -228,7 +241,7 @@ private fun ProfileScreenContent(
             }
 
             Tab(selected = false, onClick = { profileTab = ProfileTab.Schedule }) {
-                TitleLargeText(
+                TitleMediumText(
                     modifier = Modifier
                         .padding(vertical = 4.dp, horizontal = 8.dp),
                     text = stringResource(id = R.string.schedule),
@@ -237,28 +250,16 @@ private fun ProfileScreenContent(
             }
         }
 
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-                .fillMaxWidth()
-                .weight(1f),
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-
-            when (profileTab) {
-                ProfileTab.Bio -> BioScreen(user)
-                ProfileTab.Overview -> OverViewScreen(user)
-                ProfileTab.Schedule -> ScheduleScreen(user = user)
-            }
-
+        when (profileTab) {
+            ProfileTab.Bio -> BioScreen(user)
+            ProfileTab.Overview -> OverViewScreen(user)
+            ProfileTab.Schedule -> schedules?.let { ScheduleScreen(schedules = it) }
         }
 
         if (profileType == ProfileType.Public)
             ProcoButton(text = stringResource(id = R.string.booking), onClick = {})
 
-        if (isShowPriceDialog) {
+        if (isShowPriceDialog && profileType == ProfileType.Self) {
             if (savePriceLoading == false) {
                 isShowPriceDialog = false
             } else {
@@ -268,76 +269,145 @@ private fun ProfileScreenContent(
 
 
     }
-
-
 }
 
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ScheduleScreen(user: User) {
+private fun ScheduleScreen(schedules: ImmutableList<Schedule>) {
+    val dates = remember(schedules) { schedules.map { it.date }.toImmutableList() }
 
+    var currentDate by remember { mutableStateOf(dates.first()) }
 
+    val hours = remember(currentDate) { schedules.find { it.date.compareTo(currentDate) == 0 }?.hours?.toImmutableList() }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clipScrollableContainer(Orientation.Horizontal),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            contentPadding = PaddingValues(horizontal = 16.dp)
+        ) {
+            items(items = dates)
+            {
+                DateItem(localDate = it, isSelected = currentDate.compareTo(it) == 0, onClick = { currentDate = it })
+            }
+        }
+
+        FlowRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 16.dp),
+            maxItemsInEachRow = 3,
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            hours?.forEach { hour ->
+                HourRangeItem(modifier = Modifier.weight(1f, false), range = hour, onClick = {})
+            }
+        }
+    }
+
+}
+
+@Composable
+fun DateItem(localDate: LocalDate, isSelected: Boolean, onClick: () -> Unit) {
+    val showYear by remember(localDate) { mutableStateOf(LocalDate.now().year != localDate.year) }
+
+    BodyMediumText(
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .animateClickable(onClick)
+            .then(
+                if (isSelected) {
+                    Modifier.background(MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
+                } else Modifier
+            )
+            .border(1.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
+            .padding(8.dp),
+        text = (if (showYear) "${localDate.year}\n" else "") + "${localDate.month.name.take(3)}\n${localDate.dayOfMonth}",
+        textAlign = TextAlign.Center,
+        color = if (isSelected) white else MaterialTheme.colorScheme.surface
+    )
 }
 
 @Composable
 private fun OverViewScreen(user: User) {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .verticalScroll(rememberScrollState())
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
 
-    BodyLargeText(text = stringResource(R.string.job_title))
-    ProcoTextField(
-        modifier = Modifier.fillMaxWidth(),
-        value = user.job.name,
-        onValueChange = { },
-        hint = stringResource(R.string.job_title),
-        readOnly = true
-    )
-    CustomSpacer()
-    BodyLargeText(text = stringResource(R.string.expertise))
-    ProcoTextField(
-        modifier = Modifier.fillMaxWidth(),
-        value = user.expertise.name,
-        onValueChange = { },
-        hint = stringResource(R.string.expertise),
-        readOnly = true
-    )
-
-    CustomSpacer()
-    BodyLargeText(text = stringResource(R.string.experience))
-    ProcoTextField(
-        modifier = Modifier.fillMaxWidth(),
-        value = user.experience.toString(),
-        onValueChange = { },
-        hint = stringResource(R.string.experience),
-        readOnly = true
-    )
-
-    CustomSpacer()
-    BodyLargeText(text = stringResource(R.string.company))
-    ProcoTextField(
-        modifier = Modifier.fillMaxWidth(),
-        value = user.company,
-        onValueChange = { },
-        hint = stringResource(R.string.company),
-        readOnly = true
-    )
-
-    user.skills?.let { skills ->
-        CustomSpacer()
-        BodyLargeText(text = stringResource(R.string.skills))
+        BodyLargeText(text = stringResource(R.string.job_title))
         ProcoTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = skills.joinToString { "${it.name}  " },
+            value = user.job.name,
             onValueChange = { },
-            hint = stringResource(R.string.skills),
+            hint = stringResource(R.string.job_title),
             readOnly = true
         )
+        CustomSpacer()
+        BodyLargeText(text = stringResource(R.string.expertise))
+        ProcoTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = user.expertise.name,
+            onValueChange = { },
+            hint = stringResource(R.string.expertise),
+            readOnly = true
+        )
+
+        CustomSpacer()
+        BodyLargeText(text = stringResource(R.string.experience))
+        ProcoTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = user.experience.toString(),
+            onValueChange = { },
+            hint = stringResource(R.string.experience),
+            readOnly = true
+        )
+
+        CustomSpacer()
+        BodyLargeText(text = stringResource(R.string.company))
+        ProcoTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = user.company,
+            onValueChange = { },
+            hint = stringResource(R.string.company),
+            readOnly = true
+        )
+
+        user.skills?.let { skills ->
+            CustomSpacer()
+            BodyLargeText(text = stringResource(R.string.skills))
+            ProcoTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = skills.joinToString { "${it.name}  " },
+                onValueChange = { },
+                hint = stringResource(R.string.skills),
+                readOnly = true
+            )
+        }
     }
-
-
 }
 
 @Composable
 fun BioScreen(user: User) {
     BodyMediumText(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
         text = if (user.bio.isNullOrEmpty()) stringResource(id = R.string.empty_bio) else user.bio!!, textAlign = TextAlign.Justify,
         textStyle = MaterialTheme.typography.bodyMedium.copy(lineHeight = 30.sp)
     )

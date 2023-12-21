@@ -1,7 +1,7 @@
 package com.proco.domain.fake_data
 
+import com.proco.domain.model.schedule.HourRange
 import com.proco.domain.model.schedule.Schedule
-import com.proco.domain.model.time.HoursOfDay
 import com.proco.domain.model.user.Country
 import com.proco.domain.model.user.Expertise
 import com.proco.domain.model.user.Job
@@ -10,9 +10,8 @@ import com.proco.domain.model.user.User
 import com.proco.domain.model.user.UserType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
 
 
 object FakeData {
@@ -39,7 +38,7 @@ object FakeData {
             skills = listOf(Skill(name = "#android")).toImmutableList(),
             bio = "Experienced Android developer with over 5 years building and deploying apps to the Google Play Store. Skilled in Java, Kotlin, XML, Firebase, REST APIs, SQLite databases, and Material Design. Passionate about turning ideas into performant, beautiful mobile apps that delight users. Built messaging, weather, sports, and location-based apps each with over 100k downloads. Excited to join a fast-paced team to continue creating meaningful impacts in people's lives through mobile technology. Constantly learning and staying on top of latest Android advancements.",
             country = Country(code = "IR", name = "Iran"),
-            price = 1
+            price = null
         )
 
     }
@@ -63,37 +62,22 @@ object FakeData {
     }
 
     fun schedules(): List<Schedule> {
-        val temp = LocalDateTime.of(LocalDate.parse("2023-12-09"), LocalTime.parse("2023-12-09"))
         return listOf(
+            Schedule(LocalDate.now().minusMonths(1), hours = hourRange().toImmutableList().take(4).toImmutableList()),
+            Schedule(LocalDate.now(), hours = hourRange().toImmutableList()),
+            Schedule(LocalDate.now().plusDays(1), hours = hourRange().toImmutableList().take(2).toImmutableList())
         )
     }
 
-    fun hoursOfDay(): List<HoursOfDay> {
+    fun hourRange(): List<HourRange> {
         return listOf(
-            HoursOfDay("00:00 - 01:00", 0),
-            HoursOfDay("01:00 - 02:00", 1),
-            HoursOfDay("02:00 - 03:00", 2),
-            HoursOfDay("03:00 - 04:00", 3),
-            HoursOfDay("04:00 - 05:00", 4),
-            HoursOfDay("05:00 - 06:00", 5),
-            HoursOfDay("06:00 - 07:00", 6),
-            HoursOfDay("07:00 - 08:00", 7),
-            HoursOfDay("08:00 - 09:00", 8),
-            HoursOfDay("09:00 - 10:00", 9),
-            HoursOfDay("10:00 - 11:00", 10),
-            HoursOfDay("11:00 - 12:00", 11),
-            HoursOfDay("12:00 - 13:00", 12),
-            HoursOfDay("13:00 - 14:00", 13),
-            HoursOfDay("14:00 - 15:00", 14),
-            HoursOfDay("15:00 - 16:00", 15),
-            HoursOfDay("16:00 - 17:00", 16),
-            HoursOfDay("17:00 - 18:00", 17),
-            HoursOfDay("18:00 - 19:00", 18),
-            HoursOfDay("19:00 - 20:00", 19),
-            HoursOfDay("20:00 - 21:00", 20),
-            HoursOfDay("21:00 - 22:00", 21),
-            HoursOfDay("22:00 - 23:00", 22),
-            HoursOfDay("23:00 - 24:00", 23)
+            HourRange(Instant.now(), Instant.now().plusSeconds(1000)),
+            HourRange(Instant.now().plusSeconds(1000), Instant.now().plusSeconds(2000)),
+            HourRange(Instant.now().plusSeconds(3000), Instant.now().plusSeconds(4000)),
+            HourRange(Instant.now().plusSeconds(5000), Instant.now().plusSeconds(6000)),
+            HourRange(Instant.now().plusSeconds(7000), Instant.now().plusSeconds(8000)),
+            HourRange(Instant.now().plusSeconds(9000), Instant.now().plusSeconds(10000)),
+            HourRange(Instant.now().plusSeconds(11000), Instant.now().plusSeconds(120000)),
         )
     }
 

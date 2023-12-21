@@ -30,7 +30,7 @@ import com.proco.theme.white
 import com.proco.ui.R
 import com.proco.ui.button.ProcoButton
 import com.proco.ui.text.BodyLargeText
-import com.proco.ui.text.TitleLargeText
+import com.proco.ui.text.TitleMediumText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,9 +41,9 @@ fun PriceDialog(
     onDismiss: () -> Unit
 ) {
     var price by remember { mutableIntStateOf(1) }
-
     ModalBottomSheet(
-        onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.background
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.background,
     ) {
         Column(
             modifier = Modifier
@@ -53,7 +53,7 @@ fun PriceDialog(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            TitleLargeText(text = stringResource(id = title))
+            TitleMediumText(text = stringResource(id = title), maxLines = 2)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),

@@ -4,28 +4,49 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
 import com.proco.base.BaseViewModel
 import com.proco.base.UiMessage
+import com.proco.base.UiMessageType
 import com.proco.domain.model.network.DataResult
+import com.proco.domain.model.network.NetworkError
 import com.proco.domain.model.schedule.Schedule
 import com.proco.domain.usecase.schedule.SaveScheduleUseCase
+import com.proco.domain.usecase.user.GetUserUseCase
+import com.proco.domain.usecase.user.UpdatePriceUseCase
 import com.proco.extention.findIndex
 import com.proco.extention.safeAdd
 import com.proco.extention.toLocalDate
+import com.proco.ui.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ScheduleViewModel @Inject constructor(private val useCase: SaveScheduleUseCase) : BaseViewModel<ScheduleUiState, ScheduleUiEvent>() {
+class ScheduleViewModel @Inject constructor(
+    private val saveScheduleUseCase: SaveScheduleUseCase,
+    private val getUserUseCase: GetUserUseCase,
+    private val updatePriceUseCase: UpdatePriceUseCase,
+) : BaseViewModel<ScheduleUiState, ScheduleUiEvent>() {
 
     init {
+        getUser()
         getSchedule()
+    }
+
+    private fun getUser() {
+        viewModelScope.launch {
+            getUserUseCase.executeSync(GetUserUseCase.DataSourceType.Local).collect {
+                when (it) {
+                    is DataResult.Failure -> setState { currentState.copy(uiMessage = UiMessage.Network(NetworkError.AccessDenied)) }
+                    is DataResult.Success -> setState { currentState.copy(user = it.data) }
+                }
+            }
+        }
     }
 
     private fun getSchedule() {
         viewModelScope.launch {
             setState { currentState.copy(isLoading = true, uiMessage = null, isSaved = false) }
-            useCase.executeSync(currentState.localSchedule).collect {
+            saveScheduleUseCase.executeSync(currentState.localSchedule).collect {
                 when (it) {
                     is DataResult.Failure -> {
                         setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
@@ -42,7 +63,7 @@ class ScheduleViewModel @Inject constructor(private val useCase: SaveScheduleUse
     private fun save() {
         viewModelScope.launch {
             setState { currentState.copy(isLoading = true, uiMessage = null, isSaved = false) }
-            useCase.executeSync(currentState.localSchedule).collect {
+            saveScheduleUseCase.executeSync(currentState.localSchedule).collect {
                 when (it) {
                     is DataResult.Failure -> {
                         setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
@@ -56,6 +77,28 @@ class ScheduleViewModel @Inject constructor(private val useCase: SaveScheduleUse
         }
     }
 
+    private fun updatePrice(price: Int) {
+        setState { currentState.copy(savePriceLoading = true, uiMessage = null) }
+        viewModelScope.launch {
+            updatePriceUseCase.executeSync(price).collect {
+                when (it) {
+                    is DataResult.Failure -> {
+                        setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
+                    }
+
+                    is DataResult.Success -> {
+                        setState {
+                            currentState.copy(
+                                savePriceLoading = false,
+                                user = currentState.user?.copy(price = price),
+                                uiMessage = UiMessage.System(R.string.price_updated, UiMessageType.Success)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     override fun createInitialState() = ScheduleUiState()
 
@@ -63,6 +106,10 @@ class ScheduleViewModel @Inject constructor(private val useCase: SaveScheduleUse
         when (event) {
             is ScheduleUiEvent.OnSchedule -> {
                 save()
+            }
+
+            is ScheduleUiEvent.OnUpdatePrice -> {
+                updatePrice(event.price)
             }
 
             is ScheduleUiEvent.OnAddHour -> {

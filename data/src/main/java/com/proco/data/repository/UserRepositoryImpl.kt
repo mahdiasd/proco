@@ -3,6 +3,7 @@ package com.proco.data.repository
 import com.proco.data.mapper.RegisterMapper
 import com.proco.data.remote.api.ApiService
 import com.proco.data.remote.utils.safeCall
+import com.proco.domain.data_store.TokenDataStore
 import com.proco.domain.model.network.DataResult
 import com.proco.domain.model.user.User
 import com.proco.domain.repository.UserRepository
@@ -14,7 +15,7 @@ import javax.inject.Inject
 class UserRepositoryImpl @Inject constructor(
     private val apiService: ApiService,
     private val registerMapper: RegisterMapper,
-//    private val tokenDataStore: TokenDataStore
+    private val tokenDataStore: TokenDataStore,
 ) : UserRepository {
 
     override suspend fun login(email: String, password: String): Flow<DataResult<Unit>> = flow {
@@ -25,7 +26,7 @@ class UserRepositoryImpl @Inject constructor(
             }
 
             is DataResult.Success -> {
-//                tokenDataStore.saveToken(result.data.token)
+                tokenDataStore.saveToken(result.data.token)
                 emit(DataResult.Success(Unit))
             }
         }

@@ -1,7 +1,6 @@
 package com.proco.schedule
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -37,14 +36,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.proco.base.BaseScreen
 import com.proco.domain.model.schedule.HourRange
 import com.proco.domain.model.schedule.Schedule
+import com.proco.domain.model.user.User
 import com.proco.extention.animateClickable
 import com.proco.extention.baseModifier
 import com.proco.extention.dLog
-import com.proco.extention.toHour
 import com.proco.extention.toInstant
 import com.proco.extention.toLocalDate
-import com.proco.extention.toLocalDateTime
-import com.proco.extention.toMinute
 import com.proco.extention.withColor
 import com.proco.schedule.time_picker_dialog.RangeTimePicker
 import com.proco.theme.ProcoTheme
@@ -52,6 +49,8 @@ import com.proco.theme.white
 import com.proco.ui.R
 import com.proco.ui.button.ProcoButton
 import com.proco.ui.dash_line.HorizontalDashLine
+import com.proco.ui.dialog_item.PriceDialog
+import com.proco.ui.hour_range.HourRangeEditableItem
 import com.proco.ui.text.BodyMediumText
 import com.proco.ui.text.TitleMediumText
 import com.proco.utils.ProcoGravity
@@ -67,6 +66,7 @@ private fun DarkPreview() {
             schedules = listOf<Schedule>().toMutableStateList(),
             onAddTime = { _, _ -> },
             onRemoveTime = { _, _ -> },
+            onPrice = {},
             onSave = {}
         )
     }
@@ -81,6 +81,7 @@ private fun Preview() {
             schedules = listOf<Schedule>().toMutableStateList(),
             onAddTime = { date, hours -> },
             onRemoveTime = { date, hours -> },
+            onPrice = {},
             onSave = {}
         )
     }
@@ -93,10 +94,11 @@ fun ScheduleScreen(vm: ScheduleViewModel = hiltViewModel()) {
 
     BaseScreen(
         modifier = Modifier.baseModifier(),
-        uiMessage = null
+        uiMessage = uiState.uiMessage
     ) {
         ScheduleScreenContent(
             schedules = uiState.localSchedule,
+            user = uiState.user,
             onAddTime = { date, hours ->
                 vm.onTriggerEvent(ScheduleUiEvent.OnAddHour(date, hours))
             },
@@ -104,23 +106,26 @@ fun ScheduleScreen(vm: ScheduleViewModel = hiltViewModel()) {
                 vm.onTriggerEvent(ScheduleUiEvent.OnRemoveHour(date, hours))
             },
             showSaveButton = uiState.showSaveButton,
+            savePriceLoading = uiState.savePriceLoading,
+            onPrice = {},
             onSave = { vm.onTriggerEvent(ScheduleUiEvent.OnSchedule) }
-
         )
     }
-
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 private fun ScheduleScreenContent(
     schedules: SnapshotStateList<Schedule>,
+    user: User? = null,
     onAddTime: (Instant, HourRange) -> Unit,
     onRemoveTime: (Instant, HourRange) -> Unit,
     showSaveButton: Boolean = false,
-    onSave: () -> Unit
+    onSave: () -> Unit,
+    onPrice: (Int) -> Unit,
+    savePriceLoading: Boolean? = null,
 ) {
+    var isShowPriceDialog by remember(user) { mutableStateOf(user?.price == null) }
 
     val datePickerState =
         rememberDatePickerState(initialSelectedDateMillis = Instant.now().toEpochMilli(), yearRange = IntRange(LocalDateTime.now().year, LocalDateTime.now().year))
@@ -136,6 +141,7 @@ private fun ScheduleScreenContent(
                 }?.hours
             }
         }
+
 
     Column(
         modifier = Modifier
@@ -188,7 +194,7 @@ private fun ScheduleScreenContent(
                 .padding(vertical = 8.dp, horizontal = 8.dp)
         ) {
             hours.value?.forEach { hour ->
-                HourRangeItem(hour, onRemove = { onRemoveTime(selectedDate, hour) })
+                HourRangeEditableItem(hour, onRemove = { onRemoveTime(selectedDate, hour) })
             }
         }
 
@@ -214,26 +220,16 @@ private fun ScheduleScreenContent(
             onDismiss = { isShowTimePicker = false })
     }
 
+    if (isShowPriceDialog) {
+        PriceDialog(
+            title = R.string.before_schedule_choose_price,
+            onPrice = onPrice,
+            onDismiss = { isShowPriceDialog = false },
+            isLoading = savePriceLoading ?: false
+        )
+    }
 
 }
 
-@Composable
-fun HourRangeItem(range: HourRange, onRemove: () -> Unit) {
-    BodyMediumText(
-        modifier = Modifier
-            .padding(4.dp)
-            .background(MaterialTheme.colorScheme.secondary, shape = MaterialTheme.shapes.small)
-            .border(width = 1.dp, color = MaterialTheme.colorScheme.primary, shape = MaterialTheme.shapes.small)
-            .padding(8.dp),
-        text = "${range.start.toLocalDateTime().hour.toHour()}:${range.start.toLocalDateTime().minute.toMinute()} -- ${range.end.toLocalDateTime().hour.toHour()}:${range.end.toLocalDateTime().minute.toMinute()}",
-        textStyle = MaterialTheme.typography.bodyMedium.withColor(),
-        icon = R.drawable.ic_close,
-        textBottomPadding = 3.dp,
-        iconGravity = ProcoGravity.Left,
-        iconModifier = Modifier
-            .size(16.dp)
-            .animateClickable { onRemove() }
-    )
-}
 
 

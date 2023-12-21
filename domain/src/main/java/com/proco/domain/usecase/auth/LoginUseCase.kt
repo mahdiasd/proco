@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(
     @IoDispatcher dispatcher: CoroutineDispatcher,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) : ResultUseCase<LoginUseCase.LoginParam, Flow<DataResult<Unit>>>(dispatcher) {
 
     data class LoginParam(val email: String, val password: String)

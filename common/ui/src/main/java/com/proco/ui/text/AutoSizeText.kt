@@ -1,5 +1,6 @@
 package com.proco.ui.text
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -10,15 +11,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import com.proco.theme.bodyColor
+import androidx.compose.ui.text.style.TextAlign
 
 @Composable
 fun AutoSizeText(
     modifier: Modifier = Modifier,
     text: String,
-    textStyle: TextStyle,
+    textAlign: TextAlign = TextAlign.Center,
+    textStyle: TextStyle = MaterialTheme.typography.bodyMedium.copy(textAlign = textAlign),
     maxLines: Int = 1,
-    color: Color = bodyColor,
+    color: Color = MaterialTheme.colorScheme.surface,
 ) {
     var scaledTextStyle by remember { mutableStateOf(textStyle) }
     var readyToDraw by remember { mutableStateOf(false) }

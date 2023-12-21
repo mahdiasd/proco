@@ -65,8 +65,9 @@ class ProfileViewModel @Inject constructor(
             updatePriceUseCase.executeSync(price).collect {
                 when (it) {
                     is DataResult.Failure -> {
-                        setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
+                        setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError), savePriceLoading = false) }
                     }
+
                     is DataResult.Success -> {
                         setState {
                             currentState.copy(

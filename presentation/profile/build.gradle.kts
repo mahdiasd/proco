@@ -28,6 +28,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -45,6 +46,8 @@ android {
 dependencies {
     implementation(project(":domain"))
     implementation(project(":common:ui"))
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     /* --- Hilt ---*/
     implementation(libs.dagger.hilt.android)
