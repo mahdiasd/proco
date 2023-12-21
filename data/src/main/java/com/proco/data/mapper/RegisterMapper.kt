@@ -2,8 +2,9 @@ package com.proco.data.mapper
 
 import com.proco.data.model.RegisterRequest
 import com.proco.domain.usecase.auth.RegisterParam
+import javax.inject.Inject
 
-class RegisterMapper : Mapper<RegisterParam, RegisterRequest> {
+class RegisterMapper @Inject constructor() : Mapper<RegisterParam, RegisterRequest> {
     override fun mapFrom(from: RegisterParam): RegisterRequest {
         return RegisterRequest(
             name = from.name,

@@ -160,16 +160,19 @@ private fun ProfileScreenContent(
                     model = coilCircle(data = user.avatar.ifEmpty { R.drawable.ic_placeholer_avatar }),
                     contentDescription = "user avatar"
                 )
-                Icon(
-                    modifier = Modifier
-                        .align(alignment = Alignment.BottomEnd)
-                        .background(MaterialTheme.colorScheme.secondary, CircleShape)
-                        .size(32.dp)
-                        .padding(8.dp),
-                    painter = painterResource(id = R.drawable.ic_edit),
-                    contentDescription = "Edit",
-                    tint = MaterialTheme.colorScheme.surface
-                )
+
+                if (profileType == ProfileType.Self) {
+                    Icon(
+                        modifier = Modifier
+                            .align(alignment = Alignment.BottomEnd)
+                            .background(MaterialTheme.colorScheme.secondary, CircleShape)
+                            .size(32.dp)
+                            .padding(8.dp),
+                        painter = painterResource(id = R.drawable.ic_edit),
+                        contentDescription = "Edit",
+                        tint = MaterialTheme.colorScheme.surface
+                    )
+                }
             }
             Column(
                 modifier = Modifier
