@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
@@ -16,7 +17,7 @@ fun LoadingScreen(
     size: Dp = 24.dp,
     color: Color = MaterialTheme.colorScheme.primary
 ) {
-    Box(modifier) {
+    Box(modifier, contentAlignment = Alignment.Center) {
         CircularProgressIndicator(
             Modifier.size(size),
             color = color

@@ -3,6 +3,9 @@ package com.proco.domain.model.user
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.serialization.Serializable
 
+/**
+ * The `User` class represents user with all properties.
+ */
 @Serializable
 data class User(
     val id: Int,

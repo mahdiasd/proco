@@ -2,6 +2,9 @@ package com.proco.data.remote.api
 
 import com.proco.data.model.LoginResponse
 import com.proco.data.model.RegisterRequest
+import com.proco.data.model.RegisterResponse
+import com.proco.data.model.UserCacheResponse
+import com.proco.data.model.UserSummaryResponse
 import com.proco.domain.model.network.NetworkResponse
 import com.proco.domain.model.schedule.ScheduleDto
 import com.proco.domain.model.user.Country
@@ -11,7 +14,9 @@ import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -20,8 +25,8 @@ interface ApiService {
     @FormUrlEncoded
     suspend fun login(@Field("email") email: String, @Field("password") password: String): NetworkResponse<LoginResponse>
 
-    @POST
-    suspend fun saveSchedule(@Body scheduleDto: List<ScheduleDto>): NetworkResponse<Boolean>
+    @POST("user-schedule")
+    suspend fun saveSchedule(@Body scheduleDto: List<ScheduleDto>): NetworkResponse<List<ScheduleDto>>
 
     @GET("/user/mentors")
     suspend fun getUsers(
@@ -29,11 +34,11 @@ interface ApiService {
         @Query("job") jobTitle: String? = null,
         @Query("country") country: String? = null,
         @Query("page") page: Int? = null,
-    ): NetworkResponse<List<User>>
+    ): NetworkResponse<List<UserSummaryResponse>>
 
-    @GET("/user/schedule")
+    @GET("/user-schedule/mentor/{id}")
     suspend fun getSchedule(
-        @Query("id") id: Int,
+        @Path("id") id: Int,
     ): NetworkResponse<List<ScheduleDto>>
 
     @POST
@@ -43,11 +48,11 @@ interface ApiService {
     ): NetworkResponse<User>
 
     @POST("/auth/register")
-    suspend fun register(@Body registerParam: RegisterRequest): NetworkResponse<User>
+    suspend fun register(@Body registerParam: RegisterRequest): NetworkResponse<RegisterResponse>
 
-    @POST("/user/update")
+    @PATCH("/user/mentor")
     @FormUrlEncoded
-    suspend fun updatePrice(@Field("price") price: Int): NetworkResponse<User>
+    suspend fun updatePrice(@Field("cost") cost: Int): NetworkResponse<UserCacheResponse>
 
     @GET("/country")
     suspend fun getCountries(): NetworkResponse<List<Country>>

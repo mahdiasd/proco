@@ -8,8 +8,8 @@ import kotlinx.serialization.Serializable
 @Stable
 sealed class Education {
     data object Diploma : Education() // دیپلم
-    data object AssociateDegree : Education() // فوق دیپلم
-    data object BachelorsDegree : Education() // کارشناسی
-    data object MastersDegree : Education() // کارشناسی ارشد
-    data object PhdDegree : Education() // دکتری
+    data object Associate : Education() // فوق دیپلم
+    data object Bachelors : Education() // کارشناسی
+    data object Masters : Education() // کارشناسی ارشد
+    data object Phd : Education() // دکتری
 }

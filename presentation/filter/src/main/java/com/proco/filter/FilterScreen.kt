@@ -25,7 +25,7 @@ import com.proco.domain.model.user.Gender
 import com.proco.domain.model.user.Job
 import com.proco.extention.anyNull
 import com.proco.extention.baseModifier
-import com.proco.extention.name
+import com.proco.extention.uiName
 import com.proco.theme.ProcoTheme
 import com.proco.ui.R
 import com.proco.ui.bottom_dialog.ListBottomDialog
@@ -152,7 +152,7 @@ private fun FilterScreenContent(
             ProcoTextField(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { dialogType = DialogType.Gender },
-                value = userFilter.gender?.name(context) ?: "",
+                value = userFilter.gender?.uiName()?.let { stringResource(id = it) } ?: "",
                 onValueChange = { },
                 hint = stringResource(com.proco.ui.R.string.gender),
                 enabled = false,

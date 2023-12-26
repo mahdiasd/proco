@@ -60,6 +60,7 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":domain"))
     implementation(project(":common:ui"))
+    implementation(project(":presentation:splash"))
     implementation(project(":presentation:login"))
     implementation(project(":presentation:register"))
     implementation(project(":presentation:schedule"))

@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.proco.domain.model.network.getUiMessage
 import com.proco.ui.snackbar.FailedSnackBar
+import com.proco.ui.snackbar.SuccessSnackBar
 
 @Composable
 fun BaseScreen(
@@ -22,11 +23,18 @@ fun BaseScreen(
     if (uiMessage != null) {
         when (uiMessage) {
             is UiMessage.Network -> {
-                FailedSnackBar(messageText = uiMessage.networkError.getUiMessage())
+                when(uiMessage.uiMessageType){
+                    UiMessageType.Success -> SuccessSnackBar(messageText = uiMessage.networkError.getUiMessage())
+                    UiMessageType.Failure -> FailedSnackBar(messageText = uiMessage.networkError.getUiMessage())
+                }
             }
 
             is UiMessage.System -> {
-                FailedSnackBar(messageText = stringResource(id = uiMessage.error))
+                when(uiMessage.uiMessageType){
+                    UiMessageType.Success -> SuccessSnackBar(messageText = stringResource(id = uiMessage.error))
+                    UiMessageType.Failure -> FailedSnackBar(messageText = stringResource(id = uiMessage.error))
+                }
+
             }
         }
 

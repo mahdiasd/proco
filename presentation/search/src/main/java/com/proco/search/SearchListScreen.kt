@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.proco.base.BaseScreen
 import com.proco.domain.fake_data.FakeData
-import com.proco.domain.model.user.User
+import com.proco.domain.model.user.UserSummary
 import com.proco.extention.animateClickable
 import com.proco.extention.blackOrWhite
 import com.proco.extention.coloredShadow
@@ -37,12 +37,16 @@ import kotlinx.collections.immutable.toImmutableList
 
 @Preview(showBackground = true)
 @Composable
-private fun Preview() {
-    ProcoTheme {
+private fun Preview(darkTheme: Boolean = false) {
+    ProcoTheme(darkTheme) {
         SearchScreenContent(
-            users = FakeData.users().toImmutableList(),
+            users = FakeData.usersSummary().toImmutableList(),
             onFilter = { },
-            onItemClick = { }
+            onItemClick = { },
+            onSearchChanged = {},
+            onLoadMore = {},
+            onRefresh = {},
+            searchText = ""
         )
     }
 }
@@ -50,13 +54,7 @@ private fun Preview() {
 @Preview(showBackground = true)
 @Composable
 private fun DarkPreview() {
-    ProcoTheme(darkTheme = true) {
-        SearchScreenContent(
-            users = FakeData.users().toImmutableList(),
-            onFilter = { },
-            onItemClick = { }
-        )
-    }
+    Preview(true)
 }
 
 @Composable
@@ -75,8 +73,14 @@ fun SearchScreen(
     ) {
         SearchScreenContent(
             users = uiState.data,
+            searchText = uiState.searchText,
+            isLoadMore = uiState.isLoadMore,
+            isRefreshing = uiState.isLoading,
+            onSearchChanged = { vm.onTriggerEvent(SearchViewEvent.OnTyping(it)) },
+            onRefresh = { vm.onTriggerEvent(SearchViewEvent.OnRefresh) },
+            onLoadMore = { vm.onTriggerEvent(SearchViewEvent.OnNextPage) },
+            onItemClick = onItemClick,
             onFilter = onFilter,
-            onItemClick = onItemClick
         )
     }
 
@@ -85,13 +89,13 @@ fun SearchScreen(
 
 @Composable
 private fun SearchScreenContent(
-    users: ImmutableList<User>?,
-    searchText: String = "",
+    users: ImmutableList<UserSummary>?,
+    searchText: String,
+    isRefreshing: Boolean = false,
+    isLoadMore: Boolean = false,
     onSearchChanged: (String) -> Unit = {},
     onRefresh: () -> Unit = {},
     onLoadMore: () -> Unit = {},
-    isRefreshing: Boolean = false,
-    isLoadMore: Boolean = false,
     onFilter: () -> Unit,
     onItemClick: () -> Unit
 ) {

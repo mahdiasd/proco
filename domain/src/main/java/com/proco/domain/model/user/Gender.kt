@@ -6,11 +6,13 @@ import kotlinx.serialization.Serializable
 enum class Gender {
     Male,
     Female,
-    NonBinary;
-
-    override fun toString(): String {
-        return super.name.uppercase()
-    }
-
+    NonBinary,
+    Unknown,
 }
 
+fun Gender.apiName(): String {
+    return this.name.uppercase()
+}
+fun Gender.uiName(): String {
+    return this.name.uppercase()
+}

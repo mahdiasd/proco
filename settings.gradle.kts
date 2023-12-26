@@ -1,5 +1,11 @@
 import java.net.URI
 
+include(":presentation:splash")
+
+
+include(":presentation:splash")
+
+
 pluginManagement {
     repositories {
         google()

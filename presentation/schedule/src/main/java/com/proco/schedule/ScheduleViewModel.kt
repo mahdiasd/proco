@@ -8,8 +8,9 @@ import com.proco.base.UiMessageType
 import com.proco.domain.model.network.DataResult
 import com.proco.domain.model.network.NetworkError
 import com.proco.domain.model.schedule.Schedule
+import com.proco.domain.usecase.schedule.GetScheduleUseCase
 import com.proco.domain.usecase.schedule.SaveScheduleUseCase
-import com.proco.domain.usecase.user.GetUserUseCase
+import com.proco.domain.usecase.user.GetLocalUserUseCase
 import com.proco.domain.usecase.user.UpdatePriceUseCase
 import com.proco.extention.findIndex
 import com.proco.extention.safeAdd
@@ -23,38 +24,40 @@ import javax.inject.Inject
 @HiltViewModel
 class ScheduleViewModel @Inject constructor(
     private val saveScheduleUseCase: SaveScheduleUseCase,
-    private val getUserUseCase: GetUserUseCase,
+    private val getScheduleUseCase: GetScheduleUseCase,
+    private val getLocalUserUseCase: GetLocalUserUseCase,
     private val updatePriceUseCase: UpdatePriceUseCase,
 ) : BaseViewModel<ScheduleUiState, ScheduleUiEvent>() {
 
     init {
+        /* after user fetch from cache, getSchedule called for get mentor schedule*/
         getUser()
-        getSchedule()
     }
 
     private fun getUser() {
         viewModelScope.launch {
-            getUserUseCase.executeSync(GetUserUseCase.DataSourceType.Local).collect {
+            getLocalUserUseCase.executeSync(Unit).collect {
                 when (it) {
                     is DataResult.Failure -> setState { currentState.copy(uiMessage = UiMessage.Network(NetworkError.AccessDenied)) }
-                    is DataResult.Success -> setState { currentState.copy(user = it.data) }
+                    is DataResult.Success -> {
+                        setState { currentState.copy(user = it.data) }
+                        getSchedule()
+                    }
                 }
             }
         }
     }
 
-    private fun getSchedule() {
-        viewModelScope.launch {
-            setState { currentState.copy(isLoading = true, uiMessage = null, isSaved = false) }
-            saveScheduleUseCase.executeSync(currentState.localSchedule).collect {
-                when (it) {
-                    is DataResult.Failure -> {
-                        setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
-                    }
+    private suspend fun getSchedule() {
+        setState { currentState.copy(isLoading = true, uiMessage = null, isSaved = false) }
+        getScheduleUseCase.executeSync(currentState.user!!.id).collect {
+            when (it) {
+                is DataResult.Failure -> {
+                    setState { currentState.copy(isLoading = false, uiMessage = UiMessage.Network(it.networkError)) }
+                }
 
-                    is DataResult.Success -> {
-                        setState { currentState.copy(isSaved = true) }
-                    }
+                is DataResult.Success -> {
+                    setState { currentState.copy(isLoading = false, data = it.data.toImmutableList(), localSchedule = it.data.toMutableStateList()) }
                 }
             }
         }
@@ -62,36 +65,36 @@ class ScheduleViewModel @Inject constructor(
 
     private fun save() {
         viewModelScope.launch {
-            setState { currentState.copy(isLoading = true, uiMessage = null, isSaved = false) }
+            setState { currentState.copy(saveScheduleLoading = true, uiMessage = null, isSaved = false) }
             saveScheduleUseCase.executeSync(currentState.localSchedule).collect {
                 when (it) {
                     is DataResult.Failure -> {
-                        setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
+                        setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError), saveScheduleLoading = false) }
                     }
 
                     is DataResult.Success -> {
-                        setState { currentState.copy(isSaved = true) }
+                        setState { currentState.copy(isSaved = true, saveScheduleLoading = false) }
                     }
                 }
             }
         }
     }
 
-    private fun updatePrice(price: Int) {
-        setState { currentState.copy(savePriceLoading = true, uiMessage = null) }
+    private fun updatePrice(const: Int) {
+        setState { currentState.copy(saveCostLoading = true, uiMessage = null) }
         viewModelScope.launch {
-            updatePriceUseCase.executeSync(price).collect {
+            updatePriceUseCase.executeSync(const).collect {
                 when (it) {
                     is DataResult.Failure -> {
-                        setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
+                        setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError), saveCostLoading = false) }
                     }
 
                     is DataResult.Success -> {
                         setState {
                             currentState.copy(
-                                savePriceLoading = false,
-                                user = currentState.user?.copy(price = price),
-                                uiMessage = UiMessage.System(R.string.price_updated, UiMessageType.Success)
+                                saveCostLoading = false,
+                                user = currentState.user?.copy(cost = const),
+                                uiMessage = UiMessage.System(R.string.cost_updated, UiMessageType.Success)
                             )
                         }
                     }
@@ -108,7 +111,7 @@ class ScheduleViewModel @Inject constructor(
                 save()
             }
 
-            is ScheduleUiEvent.OnUpdatePrice -> {
+            is ScheduleUiEvent.OnUpdateCost -> {
                 updatePrice(event.price)
             }
 

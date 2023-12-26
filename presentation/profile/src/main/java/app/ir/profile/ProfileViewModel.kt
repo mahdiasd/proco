@@ -7,7 +7,8 @@ import com.proco.base.UiMessage
 import com.proco.base.UiMessageType
 import com.proco.domain.fake_data.FakeData
 import com.proco.domain.model.network.DataResult
-import com.proco.domain.usecase.user.GetUserUseCase
+import com.proco.domain.usecase.user.GetLocalUserUseCase
+import com.proco.domain.usecase.user.GetOnlineUserUseCase
 import com.proco.domain.usecase.user.UpdatePriceUseCase
 import com.proco.ui.R
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val getUserUseCase: GetUserUseCase,
+    private val getOnlineUserUseCase: GetOnlineUserUseCase,
+    private val getLocalUserUseCase: GetLocalUserUseCase,
     private val updatePriceUseCase: UpdatePriceUseCase,
     private val savedStateHandle: SavedStateHandle?
 ) : BaseViewModel<ProfileViewState, ProfileViewEvent>() {
@@ -24,19 +26,19 @@ class ProfileViewModel @Inject constructor(
 
     init {
         when (currentState.profileType) {
-            is ProfileType.Public -> getUser()
+            is ProfileType.Public -> getOnlineUser()
             is ProfileType.Self -> getLocalUser()
         }
     }
 
     private fun getLocalUser() {
         viewModelScope.launch {
-            getUserUseCase.executeSync(GetUserUseCase.DataSourceType.Local).collect {
+            getLocalUserUseCase.executeSync(Unit).collect {
                 when (it) {
                     is DataResult.Failure -> setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
                     is DataResult.Success -> {
                         userId = it.data.id
-                        getUser()
+                        getOnlineUser()
                     }
                 }
                 // TODO: remove fake data
@@ -46,9 +48,9 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun getUser() {
+    private fun getOnlineUser() {
         viewModelScope.launch {
-            getUserUseCase.executeSync(GetUserUseCase.DataSourceType.Local).collect {
+            getOnlineUserUseCase.executeSync(userId!!).collect {
                 when (it) {
                     is DataResult.Failure -> setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
                     is DataResult.Success -> {
@@ -72,7 +74,7 @@ class ProfileViewModel @Inject constructor(
                         setState {
                             currentState.copy(
                                 savePriceLoading = false,
-                                uiMessage = UiMessage.System(R.string.price_updated, UiMessageType.Success)
+                                uiMessage = UiMessage.System(R.string.cost_updated, UiMessageType.Success)
                             )
                         }
                     }

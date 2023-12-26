@@ -4,6 +4,7 @@ sealed class NetworkError {
     data object IoException : NetworkError()
     data object NotFound : NetworkError()
     data object AccessDenied : NetworkError()
+    data object Unauthorized : NetworkError()
     data object Unknown : NetworkError()
     data object IllegalArgumentException : NetworkError()
     data object ServerUnavailable : NetworkError()
@@ -14,10 +15,11 @@ fun NetworkError.getUiMessage(): String {
     return when (this) {
         is NetworkError.AccessDenied -> "Access denied, please re-login"
         is NetworkError.HttpException -> return message
-        is NetworkError.IoException -> "There was a problem connecting to the server. Please check your internet connection and try again. If the issue persists, contact support."
-        is NetworkError.NotFound -> "The requested resource could not be found. Please check the details and try again. If the problem continues, contact support."
-        is NetworkError.ServerUnavailable -> "Sorry, the server is currently unavailable. Please try again later. If the issue persists, contact support."
-        is NetworkError.Unknown -> return "An unexpected error occurred. Please try again later. If the problem persists, contact support for assistance."
-        is NetworkError.IllegalArgumentException -> "Oops! Something unexpected happened. Please check your input and try again. If the issue persists, contact support."
+        is NetworkError.IoException -> "Connection error. Please check network."
+        is NetworkError.NotFound -> "Not found. Check details and try again."
+        is NetworkError.ServerUnavailable -> "Server unavailable. Try again later."
+        is NetworkError.Unknown -> return "Unexpected error occurred. Try again later."
+        is NetworkError.IllegalArgumentException -> "Invalid input. Please check and try again."
+        is NetworkError.Unauthorized -> return "Unauthorized. Please login."
     }
 }

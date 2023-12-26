@@ -10,7 +10,7 @@ data class LoginUiState(
     val uiMessage: UiMessage? = null,
     val isLoading: Boolean = false,
     val isLoggedIn: Boolean = false,
-    val email: String = "mah@gmail.com",
+    val email: String = "mahdi@yahoo.com",
     val password: String = "12345678",
 ) : UiState
 

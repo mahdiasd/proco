@@ -21,7 +21,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import coil.compose.AsyncImage
 import com.proco.domain.fake_data.FakeData
-import com.proco.domain.model.user.User
+import com.proco.domain.model.user.UserSummary
 import com.proco.extention.animateClickable
 import com.proco.extention.blackOrWhite
 import com.proco.extention.coilCircle
@@ -37,12 +37,12 @@ import com.proco.utils.ProcoGravity
 @Composable
 private fun Preview() {
     ProcoTheme {
-        MentorItem(user = FakeData.users().first(), onClick = {})
+        MentorItem(user = FakeData.usersSummary().first(), onClick = {})
     }
 }
 
 @Composable
-fun MentorItem(user: User, onClick: () -> Unit) {
+fun MentorItem(user: UserSummary, onClick: () -> Unit) {
     ConstraintLayout(
         modifier = Modifier
             .animateClickable(onClick)
@@ -80,7 +80,7 @@ fun MentorItem(user: User, onClick: () -> Unit) {
                     top.linkTo(parent.top)
                     end.linkTo(parent.end)
                 },
-            model = coilCircle(data = R.drawable.ic_placeholer_avatar),
+            model = coilCircle(data = user.avatar.ifEmpty { R.drawable.ic_placeholer_avatar }),
             contentDescription = "Avatar",
         )
 
@@ -93,7 +93,7 @@ fun MentorItem(user: User, onClick: () -> Unit) {
         }) {
             BodyLargeText(
                 modifier = Modifier,
-                text = "Mahdi Asadollahpour",
+                text = "${user.name} ${user.family}",
                 textStyle = MaterialTheme.typography.bodyLarge.withColor(MaterialTheme.colorScheme.primary)
             )
 
@@ -105,7 +105,7 @@ fun MentorItem(user: User, onClick: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 BodyMediumText(
-                    text = "Android developer"
+                    text = "${user.gender}"
                 )
 
                 BodyMediumText(

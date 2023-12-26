@@ -1,5 +1,6 @@
 package com.proco.schedule
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,9 +9,9 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DatePicker
@@ -29,31 +30,28 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.proco.base.BaseScreen
 import com.proco.domain.model.schedule.HourRange
 import com.proco.domain.model.schedule.Schedule
-import com.proco.domain.model.user.User
-import com.proco.extention.animateClickable
+import com.proco.domain.model.user.UserCache
 import com.proco.extention.baseModifier
 import com.proco.extention.dLog
 import com.proco.extention.toInstant
 import com.proco.extention.toLocalDate
-import com.proco.extention.withColor
 import com.proco.schedule.time_picker_dialog.RangeTimePicker
 import com.proco.theme.ProcoTheme
 import com.proco.theme.white
 import com.proco.ui.R
-import com.proco.ui.button.ProcoButton
+import com.proco.ui.button.ProcoSmallButton
 import com.proco.ui.dash_line.HorizontalDashLine
 import com.proco.ui.dialog_item.PriceDialog
 import com.proco.ui.hour_range.HourRangeEditableItem
-import com.proco.ui.text.BodyMediumText
+import com.proco.ui.loading.LoadingScreen
+import com.proco.ui.text.LabelLargeText
 import com.proco.ui.text.TitleMediumText
-import com.proco.utils.ProcoGravity
 import kotlinx.collections.immutable.toImmutableList
 import java.time.Instant
 import java.time.LocalDateTime
@@ -99,6 +97,7 @@ fun ScheduleScreen(vm: ScheduleViewModel = hiltViewModel()) {
         ScheduleScreenContent(
             schedules = uiState.localSchedule,
             user = uiState.user,
+            isLoading = uiState.isLoading,
             onAddTime = { date, hours ->
                 vm.onTriggerEvent(ScheduleUiEvent.OnAddHour(date, hours))
             },
@@ -106,8 +105,9 @@ fun ScheduleScreen(vm: ScheduleViewModel = hiltViewModel()) {
                 vm.onTriggerEvent(ScheduleUiEvent.OnRemoveHour(date, hours))
             },
             showSaveButton = uiState.showSaveButton,
-            savePriceLoading = uiState.savePriceLoading,
-            onPrice = {},
+            savePriceLoading = uiState.saveCostLoading,
+            saveScheduleLoading = uiState.saveScheduleLoading,
+            onPrice = { vm.onTriggerEvent(ScheduleUiEvent.OnUpdateCost(it)) },
             onSave = { vm.onTriggerEvent(ScheduleUiEvent.OnSchedule) }
         )
     }
@@ -117,21 +117,25 @@ fun ScheduleScreen(vm: ScheduleViewModel = hiltViewModel()) {
 @Composable
 private fun ScheduleScreenContent(
     schedules: SnapshotStateList<Schedule>,
-    user: User? = null,
+    isLoading: Boolean = false,
+    user: UserCache? = null,
     onAddTime: (Instant, HourRange) -> Unit,
     onRemoveTime: (Instant, HourRange) -> Unit,
     showSaveButton: Boolean = false,
     onSave: () -> Unit,
     onPrice: (Int) -> Unit,
     savePriceLoading: Boolean? = null,
+    saveScheduleLoading: Boolean? = null,
 ) {
-    var isShowPriceDialog by remember(user) { mutableStateOf(user?.price == null) }
+    var isShowPriceDialog by remember(user) { mutableStateOf(user?.cost == 0) }
 
     val datePickerState =
         rememberDatePickerState(initialSelectedDateMillis = Instant.now().toEpochMilli(), yearRange = IntRange(LocalDateTime.now().year, LocalDateTime.now().year))
+
     val selectedDate: Instant by remember(datePickerState.selectedDateMillis) { mutableStateOf(datePickerState.selectedDateMillis?.toInstant() ?: Instant.now()) }
 
     var isShowTimePicker by remember { mutableStateOf(false) }
+    val showAddButton by remember(selectedDate) { derivedStateOf { selectedDate.isAfter(Instant.now()) || selectedDate.toLocalDate().compareTo(Instant.now().toLocalDate()) == 0 } }
 
     val hours =
         remember(datePickerState.selectedDateMillis, schedules) {
@@ -149,6 +153,21 @@ private fun ScheduleScreenContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
+        AnimatedVisibility(visible = showSaveButton) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .background(MaterialTheme.colorScheme.secondary, MaterialTheme.shapes.small)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                LabelLargeText(text = stringResource(id = R.string.schedule_changed_need_to_save))
+                ProcoSmallButton(text = stringResource(id = R.string.save), onClick = onSave, isLoading = saveScheduleLoading ?: false)
+            }
+        }
+
         DatePicker(
             state = datePickerState,
             title = null,
@@ -165,44 +184,40 @@ private fun ScheduleScreenContent(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .animateClickable { isShowTimePicker = true }
                 .padding(horizontal = 16.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TitleMediumText(modifier = Modifier, text = stringResource(id = R.string.schedule))
-            BodyMediumText(
-                modifier = Modifier
-                    .wrapContentSize()
-                    .background(MaterialTheme.colorScheme.primary, MaterialTheme.shapes.small)
-                    .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = stringResource(id = R.string.add_time),
-                textStyle = MaterialTheme.typography.bodyMedium.withColor(white),
-                textAlign = TextAlign.Center,
-                icon = com.proco.schedule.R.drawable.ic_add,
-                iconTint = white,
-                iconGravity = ProcoGravity.Left,
-                iconModifier = Modifier.size(12.dp),
-                textBottomPadding = 2.dp,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            )
-        }
-
-        FlowRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 8.dp)
-        ) {
-            hours.value?.forEach { hour ->
-                HourRangeEditableItem(hour, onRemove = { onRemoveTime(selectedDate, hour) })
+            AnimatedVisibility(visible = showAddButton) {
+                ProcoSmallButton(
+                    text = stringResource(id = R.string.add_time),
+                    onClick = { isShowTimePicker = true },
+                    icon = R.drawable.ic_add,
+                    iconTint = white,
+                    iconModifier = Modifier.size(12.dp),
+                    textBottomPadding = 2.dp,
+                )
             }
         }
 
-        if (showSaveButton)
-            ProcoButton(
+        if (isLoading) {
+            LoadingScreen(modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp))
+        } else {
+            FlowRow(
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally), text = stringResource(id = R.string.save), onClick = onSave
-            )
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp, horizontal = 8.dp)
+            ) {
+                hours.value?.forEach { hour ->
+                    HourRangeEditableItem(hour, onRemove = { onRemoveTime(selectedDate, hour) })
+                }
+            }
+        }
+
+
     }
 
 

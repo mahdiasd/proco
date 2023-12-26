@@ -112,7 +112,7 @@ fun BottomNavigation(
     bookingScreen: @Composable () -> Unit,
     invoiceScreen: @Composable () -> Unit,
 ) {
-    var selectedItem: NavBarItem by remember { mutableStateOf(NavBarItem.Profile) }
+    var selectedItem: NavBarItem by remember { mutableStateOf(NavBarItem.Schedule) }
 
     val itemClick: (NavBarItem) -> Unit = {
         selectedItem = it

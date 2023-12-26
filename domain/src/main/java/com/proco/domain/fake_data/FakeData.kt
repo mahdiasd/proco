@@ -1,12 +1,15 @@
 package com.proco.domain.fake_data
 
+import com.proco.domain.model.filter.UserFilter
 import com.proco.domain.model.schedule.HourRange
 import com.proco.domain.model.schedule.Schedule
 import com.proco.domain.model.user.Country
 import com.proco.domain.model.user.Expertise
+import com.proco.domain.model.user.Gender
 import com.proco.domain.model.user.Job
 import com.proco.domain.model.user.Skill
 import com.proco.domain.model.user.User
+import com.proco.domain.model.user.UserSummary
 import com.proco.domain.model.user.UserType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -21,6 +24,25 @@ object FakeData {
             user().copy(name = "Reza", family = "Ghavipour"),
             user().copy(name = "Amir", family = "Hammamian"),
             user().copy(name = "Hamed", family = "Daemi"),
+        ).toMutableList()
+    }
+
+    fun usersSummary(): MutableList<UserSummary> {
+        return listOf(
+            UserSummary(
+                id = 7827,
+                name = "Rashaunda",
+                avatar = "Lacy",
+                family = "Nacole",
+                gender = Gender.Male,
+                email = "Raheem",
+                type = UserType.Mentee,
+                cost = 5457,
+                job = Job(id = 9665, name = "Android Developer", expertises = expertises()),
+                country = null,
+                expertise = expertises(),
+                skills = null
+            )
         ).toMutableList()
     }
 
@@ -40,7 +62,10 @@ object FakeData {
             country = Country(code = "IR", name = "Iran"),
             price = null
         )
+    }
 
+    fun filter(): UserFilter {
+        return UserFilter()
     }
 
     fun skills(): MutableList<Skill> {

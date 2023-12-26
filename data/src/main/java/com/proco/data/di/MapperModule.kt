@@ -1,27 +1,23 @@
 package com.proco.data.di
 
-import com.proco.data.mapper.RegisterMapper
-import com.proco.data.mapper.ScheduleMapper
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object MapperModule {
-
-    @Singleton
-    @Provides
-    fun provideRegisterMapper(): RegisterMapper {
-        return RegisterMapper()
-    }
-
-    @Singleton
-    @Provides
-    fun provideScheduleMapper(): ScheduleMapper {
-        return ScheduleMapper()
-    }
+//
+//    @Singleton
+//    @Provides
+//    fun provideRegisterMapper(): RegisterMapper {
+//        return RegisterMapper()
+//    }
+//
+//    @Singleton
+//    @Provides
+//    fun provideScheduleMapper(): ScheduleMapper {
+//        return ScheduleMapper()
+//    }
 
 }

@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.proco.domain.model.user.Gender
 import com.proco.domain.model.user.UserType
 import com.proco.extention.animateClickable
-import com.proco.extention.name
+import com.proco.extention.uiName
 import com.proco.register.RegisterTypingType
 import com.proco.theme.white
 import com.proco.ui.bottom_dialog.ListBottomDialog
@@ -128,7 +128,7 @@ fun RegisterStep1(
 
         ProcoTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = gender?.name(context) ?: "",
+            value = gender?.uiName()?.let { stringResource(id = it) } ?: "",
             onValueChange = { },
             hint = stringResource(com.proco.ui.R.string.gender),
             enabled = false,

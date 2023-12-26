@@ -3,12 +3,11 @@ package com.proco.data.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UserDto(
+data class UserCacheResponse(
     val id: Int,
     val firstName: String,
     val lastName: String,
     val email: String,
-    val avatar: String?,
-    val sex: String,
     val type: String,
+    val cost: String?,
 )

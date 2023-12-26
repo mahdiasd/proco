@@ -33,6 +33,10 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -62,8 +66,17 @@ dependencies {
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
 
+    /* --- EncryptSharedPreferences */
+    implementation(libs.androidx.security.crypto)
 
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+
+    /*--------------------- Tests -------------------------------*/
+    testApi(libs.mockito.kotlin)
+    testApi(libs.kotlinx.coroutines.test)
+    androidTestApi(libs.dagger.hilt.android.testing)
+    kspAndroidTest(libs.dagger.hilt.android.compiler)
+    kspAndroidTest(libs.dagger.hilt.android.testing)
+    testApi(libs.junit)
+    androidTestApi(libs.ui.test.junit4)
+    androidTestApi(libs.androidx.test.ext.junit)
 }

@@ -29,7 +29,6 @@ class RegisterViewModel @Inject constructor(
         getJobs()
         getCountries()
     }
-
     private fun register() {
         setState { currentState.copy(isLoading = true, uiMessage = null) }
         viewModelScope.launch {

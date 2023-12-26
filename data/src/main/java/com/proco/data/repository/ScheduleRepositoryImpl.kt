@@ -12,7 +12,10 @@ import javax.inject.Inject
 
 class ScheduleRepositoryImpl @Inject constructor(private val apiService: ApiService, private val scheduleMapper: ScheduleMapper) : ScheduleRepository {
     override suspend fun saveSchedule(schedule: List<Schedule>) = flow {
-        emit(safeCall { apiService.saveSchedule(scheduleMapper.mapFrom(schedule)) })
+        when (val result = safeCall { apiService.saveSchedule(scheduleMapper.mapFrom(schedule)) }) {
+            is DataResult.Failure -> emit(DataResult.Failure(result.networkError))
+            is DataResult.Success -> emit(DataResult.Success(true))
+        }
     }
 
     override suspend fun getSchedule(id: Int) = flow {

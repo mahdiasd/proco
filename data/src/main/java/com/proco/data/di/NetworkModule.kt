@@ -1,6 +1,7 @@
-package com.proco.network.di
+package com.proco.data.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.proco.domain.encrypt_shared.TokenDataStore
 import com.proco.extention.dLog
 import com.proco.utils.MyConstant
 import dagger.Module
@@ -18,7 +19,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object NetworkModule {
+class NetworkModule {
     private val contentType = "application/json".toMediaType()
 
     @Singleton
@@ -30,9 +31,16 @@ object NetworkModule {
         }
     }
 
+    @Singleton
+    @Provides
+    fun getToken(tokenDataStore: TokenDataStore): String {
+        tokenDataStore.readToken().dLog("Token: ")
+        return tokenDataStore.readToken()
+    }
+
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient.Builder {
+    fun provideOkHttpClient(tokenDataStore: TokenDataStore): OkHttpClient.Builder {
         val http = OkHttpClient.Builder()
             .connectTimeout(80, TimeUnit.SECONDS)
             .readTimeout(80, TimeUnit.SECONDS)
@@ -42,7 +50,7 @@ object NetworkModule {
             val original = chain.request()
             val request = original.newBuilder()
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + "")
+                .header("Authorization", "Bearer " + getToken(tokenDataStore))
                 .header("app-type", "panel")
                 .header("Accept", "application/json")
                 .method(original.method, original.body)

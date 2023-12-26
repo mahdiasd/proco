@@ -22,7 +22,7 @@ import com.proco.extention.withColor
 import com.proco.theme.ProcoTheme
 import com.proco.utils.ProcoGravity
 
-@Preview
+@Preview(showSystemUi = true)
 @Composable
 private fun Prev() {
     ProcoTheme {

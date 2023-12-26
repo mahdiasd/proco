@@ -33,6 +33,7 @@ compose-ui = "1.5.3"
 accompanist = "0.30.1"
 coil-compose = "2.4.0"
 material-3 = "1.2.0-alpha12"
+security-crypto = "1.1.0-alpha06"
 
 
 [libraries]
@@ -64,6 +65,10 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanist" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil-compose" }
+
+# EncryptSharedPreferences
+androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "security-crypto" }
+
 
 # Dagger Hilt
 dagger-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger" }

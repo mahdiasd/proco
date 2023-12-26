@@ -9,6 +9,7 @@
     <string name="booking">Booking</string>
     <string name="schedule">Schedule</string>
     <string name="cancel">Cancel</string>
+    <string name="schedule_changed_need_to_save">Your schedule has changed\nPlease save after making changes.</string>
 
     <string name="enter_start_time">Enter start time</string>
     <string name="enter_end_time">Enter end time</string>
@@ -20,7 +21,7 @@
 
     <string name="see_all">See All</string>
     <string name="save">Save</string>
-    <string name="price_updated">Your Price updated</string>
+    <string name="cost_updated">Your Price updated</string>
     <string name="filter">Filter</string>
 
     <string name="rational_permissions">"Why Permission "</string>
@@ -52,6 +53,7 @@
     <string name="female">Female</string>
     <string name="male">Male</string>
     <string name="non_binary">Non-binary</string>
+    <string name="unknown">Unknown</string>
     <string name="country">Country</string>
     <string name="your_experience">Your Experience</string>
     <string name="experience">Experience</string>
@@ -69,6 +71,7 @@
     <string name="add_time">Add Time</string>
 
     <string name="fake_bio">"Experienced Android developer with over 5 years building and deploying apps to the Google Play Store. Skilled in Java, Kotlin, XML, Firebase, REST APIs, SQLite databases, and Material Design. Passionate about turning ideas into performant, beautiful mobile apps that delight users. Built messaging, weather, sports, and location-based apps each with over 100k downloads. Excited to join a fast-paced team to continue creating meaningful impacts in people's lives through mobile technology. Constantly learning and staying on top of latest Android advancements."</string>
+    <string name="failed_splash">Can`t get some need parameters</string>
 
 
 </resources>

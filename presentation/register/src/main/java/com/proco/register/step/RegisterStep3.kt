@@ -90,7 +90,13 @@ fun RegisterStep3(
     var isShowExperienceDialog by remember { mutableStateOf(false) }
     var isShowEducationDialog by remember { mutableStateOf(false) }
     val experienceList = remember { mutableStateListOf(Experience.Junior, Experience.Mid, Experience.Senior, Experience.Expert) }
-    val educationList = remember { mutableStateListOf(Education.Diploma, Education.AssociateDegree, Education.BachelorsDegree, Education.MastersDegree, Education.PhdDegree) }
+    val educationList = remember { mutableStateListOf(
+        Education.Diploma,
+        Education.Associate,
+        Education.Bachelors,
+        Education.Masters,
+        Education.Phd
+    ) }
 
     val suggestSkills by remember(skill) {
         derivedStateOf {
@@ -211,7 +217,7 @@ fun RegisterStep3(
     if (isShowEducationDialog) {
         ListBottomDialog(
             modifier = Modifier.fillMaxWidth(),
-            listSize = experienceList.size,
+            listSize = educationList.size,
             isShowSearch = false,
             onDismissDialog = { isShowEducationDialog = false },
             listItem = { index ->

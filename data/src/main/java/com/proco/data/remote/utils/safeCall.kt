@@ -29,15 +29,20 @@ suspend fun <T : Any> safeCall(execute: suspend () -> NetworkResponse<T>?): Data
 fun getError(throwable: Throwable): NetworkError {
     return try {
         when (throwable) {
-            is IOException -> NetworkError.IoException
-            is IllegalArgumentException -> NetworkError.IllegalArgumentException
+            is IOException -> {
+                NetworkError.IoException
+            }
+            is IllegalArgumentException -> {
+                NetworkError.IllegalArgumentException
+            }
             is HttpException -> {
-                val errorBody: String = throwable.response()?.errorBody()?.string() ?: ""
-                val message = Json.decodeFromString<NetworkException?>(errorBody)?.getParseMessage().toString() ?: ""
+                if (throwable.code() == 500) {
+                    return NetworkError.ServerUnavailable
+                }
 
                 when (throwable.code()) {
                     // unauthorized
-                    HttpURLConnection.HTTP_UNAUTHORIZED -> NetworkError.HttpException(message)
+                    HttpURLConnection.HTTP_UNAUTHORIZED -> NetworkError.Unauthorized
 
                     // not found
                     HttpURLConnection.HTTP_NOT_FOUND -> NetworkError.NotFound
@@ -49,11 +54,19 @@ fun getError(throwable: Throwable): NetworkError {
                     HttpURLConnection.HTTP_SERVER_ERROR -> NetworkError.ServerUnavailable
 
                     // all the others will be treated as unknown error
-                    else -> NetworkError.Unknown
+                    else -> {
+                        val errorBody: String = throwable.response()?.errorBody()?.string() ?: ""
+                        val t = Json.decodeFromString<NetworkException?>(errorBody)
+                        val message = t?.getParseMessage() ?: ""
+
+                        NetworkError.HttpException(message)
+                    }
                 }
             }
 
-            else -> NetworkError.Unknown
+            else -> {
+                NetworkError.Unknown
+            }
         }
     } catch (e: Exception) {
         "${e.message} ".eLog(tag = "Retrofit", plusTag = "safeCall getError exception")

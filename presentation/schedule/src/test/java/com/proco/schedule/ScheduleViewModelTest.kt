@@ -2,7 +2,10 @@ package com.proco.schedule
 
 import com.proco.domain.model.schedule.HourRange
 import com.proco.domain.model.schedule.Schedule
+import com.proco.domain.usecase.schedule.GetScheduleUseCase
 import com.proco.domain.usecase.schedule.SaveScheduleUseCase
+import com.proco.domain.usecase.user.GetLocalUserUseCase
+import com.proco.domain.usecase.user.UpdatePriceUseCase
 import com.proco.extention.toLocalDate
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -23,6 +26,9 @@ import java.time.Instant
 
 class ScheduleViewModelTest {
     private var saveScheduleUseCase: SaveScheduleUseCase = mock()
+    private var getScheduleUseCase: GetScheduleUseCase = mock()
+    private var updatePriceUseCase: UpdatePriceUseCase = mock()
+    private var getLocalUserUseCase: GetLocalUserUseCase = mock()
 
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -41,7 +47,7 @@ class ScheduleViewModelTest {
 
     @Test
     fun `remove hour from schedule`() = runBlocking {
-        val vm = ScheduleViewModel(saveScheduleUseCase)
+        val vm = ScheduleViewModel(saveScheduleUseCase = saveScheduleUseCase, updatePriceUseCase = updatePriceUseCase, getScheduleUseCase = getScheduleUseCase, getLocalUserUseCase = getLocalUserUseCase)
 
         // Test data
         val date = Instant.now()

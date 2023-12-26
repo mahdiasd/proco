@@ -1,9 +1,11 @@
 package com.proco.data.di
 
+import com.proco.data.encrypt_shared.UserIdRepositoryImpl
 import com.proco.data.repository.CountryRepositoryImpl
 import com.proco.data.repository.JobRepositoryImpl
 import com.proco.data.repository.ScheduleRepositoryImpl
 import com.proco.data.repository.UserRepositoryImpl
+import com.proco.domain.encrypt_shared.UserIdRepository
 import com.proco.domain.repository.CountryRepository
 import com.proco.domain.repository.JobRepository
 import com.proco.domain.repository.ScheduleRepository
@@ -33,4 +35,8 @@ interface BindRepositories {
     @Binds
     @Singleton
     fun bindJobRepo(repository: JobRepositoryImpl): JobRepository
+
+    @Binds
+    @Singleton
+    fun bindUserIdRepo(repository: UserIdRepositoryImpl): UserIdRepository
 }

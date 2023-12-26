@@ -6,6 +6,7 @@ import com.proco.base.UiMessage
 import com.proco.domain.model.network.DataResult
 import com.proco.domain.usecase.GetMentorListUseCase
 import com.proco.domain.usecase.filter.GetUserFilterUseCase
+import com.proco.utils.MyConstant
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
@@ -22,7 +23,7 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun getUsers() {
-        setState { currentState.copy(isLoading = true, uiMessage = null) }
+        setLoadingState()
         viewModelScope.launch {
             useCase.executeSync(
                 GetMentorListUseCase.GetMentorListParam(
@@ -34,11 +35,15 @@ class SearchViewModel @Inject constructor(
             ).collect {
                 when (it) {
                     is DataResult.Success -> {
-                        setState { currentState.copy(isLoading = false, data = it.data.toImmutableList(), uiMessage = null) }
+                        setState { currentState.copy(isLoading = false, isLoadMore = false, uiMessage = null) }
+                        if (currentState.page == MyConstant.defaultPageNumber)
+                            setState { currentState.copy(isLoading = false, data = it.data.toImmutableList(), uiMessage = null) }
+                        else
+                            setState { currentState.copy(isLoading = false, data = data?.toMutableList()?.apply { this.addAll(it.data) }?.toImmutableList(), uiMessage = null) }
                     }
 
                     is DataResult.Failure -> {
-                        setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
+                        setState { currentState.copy(isLoading = false, isLoadMore = false, uiMessage = UiMessage.Network(it.networkError)) }
                     }
                 }
             }
@@ -54,12 +59,29 @@ class SearchViewModel @Inject constructor(
         }
     }
 
+    private fun setLoadingState() {
+        if (currentState.page == MyConstant.defaultPageNumber)
+            setState { currentState.copy(isLoading = true, uiMessage = null) }
+        else
+            setState { currentState.copy(isLoadMore = true, uiMessage = null) }
+    }
+
     override fun createInitialState() = SearchViewState()
 
     override fun onTriggerEvent(event: SearchViewEvent) {
         when (event) {
             is SearchViewEvent.OnTyping -> {
                 setState { currentState.copy(searchText = event.text) }
+                getUsers()
+            }
+
+            is SearchViewEvent.OnNextPage -> {
+                setState { currentState.copy(page = page + 1) }
+                getUsers()
+            }
+
+            is SearchViewEvent.OnRefresh -> {
+                setState { currentState.copy(page = MyConstant.defaultPageNumber) }
                 getUsers()
             }
         }

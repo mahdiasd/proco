@@ -72,3 +72,9 @@ fun Instant.toLocalDate(zoneId: ZoneId = ZoneId.systemDefault()): LocalDate {
 fun Instant.toLocalTime(zoneId: ZoneId = ZoneId.systemDefault()): LocalTime {
     return this.atZone(zoneId).toLocalTime()
 }
+
+
+/*--------------- String TimeStamp to Instant ---------------------*/
+fun String.toInstant(): Instant {
+    return Instant.parse(this)
+}

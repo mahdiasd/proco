@@ -17,7 +17,7 @@ data class NetworkException(
     fun getParseMessage(): String {
         return when (message) {
             is JsonArray -> {
-                message.joinToString { "\n" }
+                message.joinToString(separator = "\n").replace("\"", "")
             }
 
             is JsonElement -> {
