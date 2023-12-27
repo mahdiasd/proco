@@ -15,8 +15,8 @@ data class UserSummary(
     val email: String,
     val type: UserType,
     val cost: Int,
-    val job: Job,
-    val country: Country?,
-    val expertise: ImmutableList<Expertise>,
+    val job: String,
+    val country: String?,
+    val expertises: ImmutableList<Expertise>,
     val skills: ImmutableList<Skill>?
 )

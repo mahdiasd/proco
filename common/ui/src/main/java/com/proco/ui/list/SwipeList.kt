@@ -27,6 +27,8 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.proco.extention.OnBottomReached
 import com.proco.theme.white
+import com.proco.ui.vector.EmptyScreen
+import com.proco.ui.vector.FailedScreen
 
 @Preview(showBackground = true)
 @Composable
@@ -91,13 +93,16 @@ fun SwipeList(
             }
 
             if (showEmptyVector) {
-//                CatContent()
+                EmptyScreen(modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center))
             }
 
             if (showErrorVector) {
-//                DogContent(onClick = { onRefresh() })
+                FailedScreen(modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center), onRetry = onRefresh)
             }
-
         }
     }
 

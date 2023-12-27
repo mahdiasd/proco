@@ -13,6 +13,8 @@ fun NavGraphBuilder.mainScreen(
     scheduleScreen: @Composable () -> Unit,
     bookingScreen: @Composable () -> Unit,
     invoiceScreen: @Composable () -> Unit,
+    navigateToLogin: () -> Unit
+
 ) {
     composable(route = mainRoute) {
         MainScreen(
@@ -21,6 +23,7 @@ fun NavGraphBuilder.mainScreen(
             scheduleScreen = scheduleScreen,
             bookingScreen = bookingScreen,
             invoiceScreen = invoiceScreen,
+            navigateToLogin = navigateToLogin
         )
     }
 }

@@ -48,16 +48,25 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getSchedule() {
-        setState { currentState.copy(isLoading = true, uiMessage = null, isSaved = false) }
-        getScheduleUseCase.executeSync(currentState.user!!.id).collect {
-            when (it) {
-                is DataResult.Failure -> {
-                    setState { currentState.copy(isLoading = false, uiMessage = UiMessage.Network(it.networkError)) }
-                }
+    private fun getSchedule() {
+        viewModelScope.launch {
+            setState { currentState.copy(isLoading = true, uiMessage = null, isSaved = false, showRetryGetSchedule = false) }
+            getScheduleUseCase.executeSync(currentState.user!!.id).collect {
+                when (it) {
+                    is DataResult.Failure -> {
+                        setState { currentState.copy(isLoading = false, uiMessage = UiMessage.Network(it.networkError), showRetryGetSchedule = true) }
+                    }
 
-                is DataResult.Success -> {
-                    setState { currentState.copy(isLoading = false, data = it.data.toImmutableList(), localSchedule = it.data.toMutableStateList()) }
+                    is DataResult.Success -> {
+                        setState {
+                            currentState.copy(
+                                isLoading = false,
+                                showRetryGetSchedule = false,
+                                data = it.data.toImmutableList(),
+                                localSchedule = it.data.toMutableStateList()
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -73,7 +82,7 @@ class ScheduleViewModel @Inject constructor(
                     }
 
                     is DataResult.Success -> {
-                        setState { currentState.copy(isSaved = true, saveScheduleLoading = false) }
+                        setState { currentState.copy(isSaved = true, saveScheduleLoading = false, showSaveButton = false) }
                     }
                 }
             }
@@ -107,6 +116,10 @@ class ScheduleViewModel @Inject constructor(
 
     override fun onTriggerEvent(event: ScheduleUiEvent) {
         when (event) {
+            is ScheduleUiEvent.OnRetry -> {
+                getSchedule()
+            }
+
             is ScheduleUiEvent.OnSchedule -> {
                 save()
             }

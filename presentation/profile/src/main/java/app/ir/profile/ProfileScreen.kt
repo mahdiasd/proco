@@ -48,6 +48,7 @@ import com.proco.base.BaseScreen
 import com.proco.domain.fake_data.FakeData
 import com.proco.domain.model.schedule.Schedule
 import com.proco.domain.model.user.User
+import com.proco.domain.model.user.UserType
 import com.proco.extention.animateClickable
 import com.proco.extention.baseModifier
 import com.proco.extention.coilCircle
@@ -72,14 +73,16 @@ import java.time.LocalDate
 @Composable
 private fun Preview(darkTheme: Boolean = false) {
     ProcoTheme(darkTheme = darkTheme) {
-        ProfileScreenContent(
-            onBooking = { },
-            onEdit = { },
-            user = FakeData.user(),
-            profileType = ProfileType.Self,
-            schedules = null,
-            onPrice = {}
-        )
+        BaseScreen(modifier = Modifier.baseModifier()) {
+            ProfileScreenContent(
+                onBooking = { },
+                onEdit = { },
+                user = FakeData.user(),
+                profileType = ProfileType.Self,
+                schedules = null,
+                onPrice = {}
+            )
+        }
     }
 }
 
@@ -102,20 +105,24 @@ fun ProfileScreen(
         uiMessage = uiState.uiMessage
     ) {
 
-        if (uiState.isLoading) {
-            LoadingScreen()
-        } else if (uiState.data == null) {
-            ErrorScreen(modifier = Modifier.fillMaxSize(), errorMessage = uiState.uiMessage.toString())
-        } else {
-            ProfileScreenContent(
-                user = uiState.data,
-                onBooking = onBooking,
-                onEdit = onEdit,
-                profileType = uiState.profileType,
-                savePriceLoading = uiState.savePriceLoading,
-                schedules = uiState.schedule,
-                onPrice = { vm.onTriggerEvent(ProfileViewEvent.OnChangePrice(it)) }
-            )
+        when {
+            uiState.isLoading -> {
+                LoadingScreen(modifier = Modifier.fillMaxSize())
+            }
+            uiState.data == null -> {
+                ErrorScreen(modifier = Modifier.fillMaxSize(), errorMessage = uiState.uiMessage.toString())
+            }
+            else -> {
+                ProfileScreenContent(
+                    user = uiState.data,
+                    onBooking = onBooking,
+                    onEdit = onEdit,
+                    profileType = uiState.profileType,
+                    savePriceLoading = uiState.savePriceLoading,
+                    schedules = uiState.schedule,
+                    onPrice = { vm.onTriggerEvent(ProfileViewEvent.OnChangePrice(it)) }
+                )
+            }
         }
 
     }
@@ -137,7 +144,7 @@ private fun ProfileScreenContent(
     onPrice: (Int) -> Unit,
     savePriceLoading: Boolean? = null,
 ) {
-    var profileTab: ProfileTab by remember { mutableStateOf(ProfileTab.Schedule) }
+    var profileTab: ProfileTab by remember { mutableStateOf(ProfileTab.Bio) }
     var isShowPriceDialog by remember { mutableStateOf(false) }
 
     Column(
@@ -185,31 +192,31 @@ private fun ProfileScreenContent(
                 BodyMediumText(text = "Android Developer")
             }
 
-            if (user.price == null && profileType == ProfileType.Self) {
-                Icon(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .animateClickable { isShowPriceDialog = true }
-                        .padding(6.dp),
-                    painter = painterResource(id = R.drawable.ic_dollar),
-                    contentDescription = "Edit",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            } else {
-                BodyLargeText(
-                    modifier = Modifier
-                        .size(40.dp, 40.dp)
-                        .animateClickable { isShowPriceDialog = true }
-                        .background(MaterialTheme.colorScheme.primary, CircleShape)
-                        .padding(8.dp),
-                    text = "${user.price} $",
-                    color = white,
-                    textAlign = TextAlign.Center
-                )
+            if (user.type is UserType.Mentor) {
+                if (user.cost == 0 && profileType is ProfileType.Self) {
+                    Icon(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .animateClickable { isShowPriceDialog = true }
+                            .padding(6.dp),
+                        painter = painterResource(id = R.drawable.ic_dollar),
+                        contentDescription = "Edit",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                } else {
+                    BodyLargeText(
+                        modifier = Modifier
+                            .size(40.dp, 40.dp)
+                            .animateClickable { isShowPriceDialog = true }
+                            .background(MaterialTheme.colorScheme.primary, CircleShape)
+                            .padding(8.dp),
+                        text = "${user.cost} $",
+                        color = white,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
-
-//        HorizontalDashLine(modifier = Modifier.fillMaxWidth())
 
         TabRow(
             modifier = Modifier.fillMaxWidth(),
@@ -243,13 +250,15 @@ private fun ProfileScreenContent(
                 )
             }
 
-            Tab(selected = false, onClick = { profileTab = ProfileTab.Schedule }) {
-                TitleMediumText(
-                    modifier = Modifier
-                        .padding(vertical = 4.dp, horizontal = 8.dp),
-                    text = stringResource(id = R.string.schedule),
-                    color = if (profileTab == ProfileTab.Schedule) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-                )
+            if (user.type is UserType.Mentor) {
+                Tab(selected = false, onClick = { profileTab = ProfileTab.Schedule }) {
+                    TitleMediumText(
+                        modifier = Modifier
+                            .padding(vertical = 4.dp, horizontal = 8.dp),
+                        text = stringResource(id = R.string.schedule),
+                        color = if (profileTab == ProfileTab.Schedule) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                    )
+                }
             }
         }
 
@@ -280,7 +289,7 @@ private fun ProfileScreenContent(
 private fun ScheduleScreen(schedules: ImmutableList<Schedule>) {
     val dates = remember(schedules) { schedules.map { it.date }.toImmutableList() }
 
-    var currentDate by remember { mutableStateOf(dates.first()) }
+    var currentDate by remember { mutableStateOf(dates.firstOrNull()) }
 
     val hours = remember(currentDate) { schedules.find { it.date.compareTo(currentDate) == 0 }?.hours?.toImmutableList() }
 
@@ -301,7 +310,7 @@ private fun ScheduleScreen(schedules: ImmutableList<Schedule>) {
         ) {
             items(items = dates)
             {
-                DateItem(localDate = it, isSelected = currentDate.compareTo(it) == 0, onClick = { currentDate = it })
+                DateItem(localDate = it, isSelected = currentDate?.compareTo(it) == 0, onClick = { currentDate = it })
             }
         }
 
@@ -356,7 +365,7 @@ private fun OverViewScreen(user: User) {
         BodyLargeText(text = stringResource(R.string.job_title))
         ProcoTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = user.job.name,
+            value = user.job,
             onValueChange = { },
             hint = stringResource(R.string.job_title),
             readOnly = true
@@ -365,7 +374,7 @@ private fun OverViewScreen(user: User) {
         BodyLargeText(text = stringResource(R.string.expertise))
         ProcoTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = user.expertise.name,
+            value = user.expertises?.map { it.name }?.joinToString(" - ") ?: "",
             onValueChange = { },
             hint = stringResource(R.string.expertise),
             readOnly = true

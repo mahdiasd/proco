@@ -52,6 +52,7 @@ import com.proco.ui.hour_range.HourRangeEditableItem
 import com.proco.ui.loading.LoadingScreen
 import com.proco.ui.text.LabelLargeText
 import com.proco.ui.text.TitleMediumText
+import com.proco.ui.vector.FailedScreen
 import kotlinx.collections.immutable.toImmutableList
 import java.time.Instant
 import java.time.LocalDateTime
@@ -59,28 +60,20 @@ import java.time.LocalDateTime
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun DarkPreview() {
-    ProcoTheme(darkTheme = true) {
-        ScheduleScreenContent(
-            schedules = listOf<Schedule>().toMutableStateList(),
-            onAddTime = { _, _ -> },
-            onRemoveTime = { _, _ -> },
-            onPrice = {},
-            onSave = {}
-        )
-    }
-
+    Preview(true)
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun Preview() {
-    ProcoTheme(darkTheme = false) {
+private fun Preview(darkTheme: Boolean = false) {
+    ProcoTheme(darkTheme = darkTheme) {
         ScheduleScreenContent(
             schedules = listOf<Schedule>().toMutableStateList(),
             onAddTime = { date, hours -> },
             onRemoveTime = { date, hours -> },
             onPrice = {},
-            onSave = {}
+            onSave = {},
+            onRetry = {}
         )
     }
 }
@@ -107,8 +100,10 @@ fun ScheduleScreen(vm: ScheduleViewModel = hiltViewModel()) {
             showSaveButton = uiState.showSaveButton,
             savePriceLoading = uiState.saveCostLoading,
             saveScheduleLoading = uiState.saveScheduleLoading,
+            showRetryGetSchedule = uiState.showRetryGetSchedule,
             onPrice = { vm.onTriggerEvent(ScheduleUiEvent.OnUpdateCost(it)) },
-            onSave = { vm.onTriggerEvent(ScheduleUiEvent.OnSchedule) }
+            onSave = { vm.onTriggerEvent(ScheduleUiEvent.OnSchedule) },
+            onRetry = { vm.onTriggerEvent(ScheduleUiEvent.OnRetry) }
         )
     }
 }
@@ -122,8 +117,10 @@ private fun ScheduleScreenContent(
     onAddTime: (Instant, HourRange) -> Unit,
     onRemoveTime: (Instant, HourRange) -> Unit,
     showSaveButton: Boolean = false,
+    onRetry: () -> Unit,
     onSave: () -> Unit,
     onPrice: (Int) -> Unit,
+    showRetryGetSchedule: Boolean = false,
     savePriceLoading: Boolean? = null,
     saveScheduleLoading: Boolean? = null,
 ) {
@@ -137,12 +134,16 @@ private fun ScheduleScreenContent(
     var isShowTimePicker by remember { mutableStateOf(false) }
     val showAddButton by remember(selectedDate) { derivedStateOf { selectedDate.isAfter(Instant.now()) || selectedDate.toLocalDate().compareTo(Instant.now().toLocalDate()) == 0 } }
 
+    schedules.forEachIndexed { index, schedule ->
+        schedule.date.compareTo(datePickerState.selectedDateMillis?.toInstant()?.toLocalDate()).dLog("index: $index -> ")
+    }
+
     val hours =
         remember(datePickerState.selectedDateMillis, schedules) {
             derivedStateOf {
-                schedules.find {
+                schedules.filter {
                     it.date.compareTo(datePickerState.selectedDateMillis?.toInstant()?.toLocalDate()) == 0
-                }?.hours
+                }.map { it.hours }.flatten().toImmutableList()
             }
         }
 
@@ -202,16 +203,25 @@ private fun ScheduleScreenContent(
         }
 
         if (isLoading) {
-            LoadingScreen(modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp))
+            LoadingScreen(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
+        } else if (showRetryGetSchedule) {
+            FailedScreen(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                onRetry = onRetry
+            )
         } else {
             FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp, horizontal = 8.dp)
             ) {
-                hours.value?.forEach { hour ->
+                hours.value.forEach { hour ->
                     HourRangeEditableItem(hour, onRemove = { onRemoveTime(selectedDate, hour) })
                 }
             }
@@ -223,7 +233,7 @@ private fun ScheduleScreenContent(
 
     if (isShowTimePicker) {
         RangeTimePicker(
-            hours = hours.value?.toImmutableList(),
+            hours = hours.value.toImmutableList(),
             onSave = { start, end ->
                 val a = HourRange(start.toInstant(selectedDate), end.toInstant(selectedDate))
                 a.start.toEpochMilli().dLog("start")

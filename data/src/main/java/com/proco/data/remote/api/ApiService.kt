@@ -4,12 +4,12 @@ import com.proco.data.model.LoginResponse
 import com.proco.data.model.RegisterRequest
 import com.proco.data.model.RegisterResponse
 import com.proco.data.model.UserCacheResponse
+import com.proco.data.model.UserResponse
 import com.proco.data.model.UserSummaryResponse
 import com.proco.domain.model.network.NetworkResponse
 import com.proco.domain.model.schedule.ScheduleDto
 import com.proco.domain.model.user.Country
 import com.proco.domain.model.user.Job
-import com.proco.domain.model.user.User
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -37,15 +37,10 @@ interface ApiService {
     ): NetworkResponse<List<UserSummaryResponse>>
 
     @GET("/user-schedule/mentor/{id}")
-    suspend fun getSchedule(
-        @Path("id") id: Int,
-    ): NetworkResponse<List<ScheduleDto>>
+    suspend fun getSchedule(@Path("id") id: Int, ): NetworkResponse<List<ScheduleDto>>
 
-    @POST
-    @FormUrlEncoded
-    suspend fun getUser(
-        @Field("id") id: Int,
-    ): NetworkResponse<User>
+    @GET("user/mentor/{id}")
+    suspend fun getUser(@Path("id") id: Int, ): NetworkResponse<UserResponse>
 
     @POST("/auth/register")
     suspend fun register(@Body registerParam: RegisterRequest): NetworkResponse<RegisterResponse>

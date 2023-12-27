@@ -1,6 +1,7 @@
 package com.proco.data.repository
 
 import com.proco.data.mapper.RegisterMapper
+import com.proco.data.mapper.toUser
 import com.proco.data.mapper.toUserCache
 import com.proco.data.mapper.toUserSummaryList
 import com.proco.data.remote.api.ApiService
@@ -57,7 +58,10 @@ class UserRepositoryImpl @Inject constructor(
 
 
     override suspend fun getUser(id: Int) = flow {
-        emit(safeCall { apiService.getUser(id) })
+        when (val result = safeCall { apiService.getUser(id) }) {
+            is DataResult.Failure -> emit(DataResult.Failure(result.networkError))
+            is DataResult.Success -> emit(DataResult.Success(result.data.toUser()))
+        }
     }
 
 

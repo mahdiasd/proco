@@ -9,51 +9,37 @@ import com.proco.extention.toLocalDate
 import kotlinx.collections.immutable.toImmutableList
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.time.LocalDateTime
 
 class MapperExtensionTest {
     @Test
     fun `list of scheduleDto to list of schedule`() {
-        val oneStart = LocalDateTime.of(2023, 12, 20, 15, 10, 0)
-        val oneEnd = LocalDateTime.of(2023, 12, 20, 15, 50, 0)
-
-        val twoStart = LocalDateTime.of(2023, 12, 20, 17, 10, 0)
-        val twoEnd = LocalDateTime.of(2023, 12, 20, 18, 50, 0)
-
-        val threeStart = LocalDateTime.of(2023, 12, 21, 10, 10, 0)
-        val threeEnd = LocalDateTime.of(2023, 12, 21, 11, 50, 0)
-
         val scheduleDtoList = listOf(
-            ScheduleDto(oneStart.toInstant().toEpochMilli(), oneEnd.toInstant().toEpochMilli()),
-            ScheduleDto(twoStart.toInstant().toEpochMilli(), twoEnd.toInstant().toEpochMilli()),
-            ScheduleDto(threeStart.toInstant().toEpochMilli(), threeEnd.toInstant().toEpochMilli()),
+            ScheduleDto("2023-12-27T07:31:18.350Z", "2023-12-27T07:46:00.000Z"),
+            ScheduleDto("2023-12-27T11:30:00.000Z", "2023-12-27T13:30:00.000Z"),
+            ScheduleDto("2023-12-28T08:00:00.000Z", "2023-12-28T08:15:00.000Z"),
         )
 
         val expectedSchedule = listOf(
             Schedule(
-                date = oneStart.toLocalDate(),
+                date = "2023-12-27T07:31:18.350Z".toInstant().toLocalDate(),
                 hours = listOf(
-                    HourRange(oneStart.toInstant(), oneEnd.toInstant()),
-                    HourRange(twoStart.toInstant(), twoEnd.toInstant())
-                )
-                    .toImmutableList()
+                    HourRange("2023-12-27T07:31:18.350Z".toInstant(), "2023-12-27T07:46:00.000Z".toInstant()),
+                    HourRange("2023-12-27T11:30:00.000Z".toInstant(), "2023-12-27T13:30:00.000Z".toInstant()),
+                ).toImmutableList()
             ),
             Schedule(
-                date = threeStart.toInstant().toLocalDate(),
+                date = "2023-12-28T08:00:00.000Z".toInstant().toLocalDate(),
                 hours = listOf(
-                    HourRange(threeStart.toInstant(), threeEnd.toInstant()),
-                )
-                    .toImmutableList()
+                    HourRange("2023-12-28T08:00:00.000Z".toInstant(), "2023-12-28T08:15:00.000Z".toInstant()),
+                ).toImmutableList()
             )
         )
 
         val scheduleList = scheduleDtoList.toSchedule()
         for (i in scheduleList.indices) {
-            val a = scheduleList[i].date.compareTo(expectedSchedule[i].date)
-
             assertTrue(scheduleList[i].date.compareTo(expectedSchedule[i].date) == 0)
 
-            for (j in scheduleList[i].hours.indices) {
+            for (j in expectedSchedule[i].hours.indices) {
                 assertTrue(scheduleList[i].hours[j].start.toEpochMilli() == expectedSchedule[i].hours[j].start.toEpochMilli())
                 assertTrue(scheduleList[i].hours[j].end.toEpochMilli() == expectedSchedule[i].hours[j].end.toEpochMilli())
             }

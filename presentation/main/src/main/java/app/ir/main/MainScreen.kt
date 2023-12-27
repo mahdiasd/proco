@@ -29,6 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.proco.domain.model.user.UserType
 import com.proco.theme.ProcoTheme
 import com.proco.ui.R
+import com.proco.ui.loading.LoadingScreen
 import com.proco.ui.text.BodyMediumText
 
 
@@ -84,22 +85,28 @@ fun MainScreen(
     scheduleScreen: @Composable () -> Unit,
     bookingScreen: @Composable () -> Unit,
     invoiceScreen: @Composable () -> Unit,
+    navigateToLogin: () -> Unit
 ) {
 
     val uiState = vm.uiState.collectAsState().value
 
-
-    if (uiState.user == null) {
-
-    } else {
-        BottomNavigation(
-            userType = uiState.user.type,
-            searchScreen = searchScreen,
-            profileScreen = profileScreen,
-            scheduleScreen = scheduleScreen,
-            bookingScreen = bookingScreen,
-            invoiceScreen = invoiceScreen,
-        )
+    when {
+        uiState.userNotFound -> {
+            navigateToLogin()
+        }
+        uiState.user != null -> {
+            BottomNavigation(
+                userType = uiState.user.type,
+                searchScreen = searchScreen,
+                profileScreen = profileScreen,
+                scheduleScreen = scheduleScreen,
+                bookingScreen = bookingScreen,
+                invoiceScreen = invoiceScreen,
+            )
+        }
+        else -> {
+            LoadingScreen(modifier = Modifier.fillMaxSize())
+        }
     }
 }
 
@@ -112,7 +119,14 @@ fun BottomNavigation(
     bookingScreen: @Composable () -> Unit,
     invoiceScreen: @Composable () -> Unit,
 ) {
-    var selectedItem: NavBarItem by remember { mutableStateOf(NavBarItem.Schedule) }
+    var selectedItem: NavBarItem by remember {
+        mutableStateOf(
+            when (userType) {
+                UserType.Mentee -> NavBarItem.Search
+                UserType.Mentor -> NavBarItem.Profile
+            }
+        )
+    }
 
     val itemClick: (NavBarItem) -> Unit = {
         selectedItem = it
@@ -139,7 +153,7 @@ fun BottomNavigation(
     ) {
         Box(
             modifier = Modifier
-                .padding(start = it.calculateLeftPadding(LayoutDirection.Ltr) , end = it.calculateLeftPadding(LayoutDirection.Ltr) , bottom = it.calculateBottomPadding())
+                .padding(start = it.calculateLeftPadding(LayoutDirection.Ltr), end = it.calculateLeftPadding(LayoutDirection.Ltr), bottom = it.calculateBottomPadding())
                 .fillMaxSize()
         ) {
             when (selectedItem) {

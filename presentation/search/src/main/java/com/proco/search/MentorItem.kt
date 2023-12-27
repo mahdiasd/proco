@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -59,8 +60,8 @@ fun MentorItem(user: UserSummary, onClick: () -> Unit) {
         Spacer(
             modifier = Modifier
                 .coloredShadow(MaterialTheme.colorScheme.tertiary, alpha = 0.5f)
-                .shadow(3.dp, MaterialTheme.shapes.large)
-                .background(blackOrWhite(), MaterialTheme.shapes.large)
+                .shadow(3.dp, MaterialTheme.shapes.medium)
+                .background(blackOrWhite(), MaterialTheme.shapes.medium)
                 .constrainAs(spacerRef)
                 {
                     top.linkTo(avatarRef.top, margin = 24.dp)
@@ -104,13 +105,11 @@ fun MentorItem(user: UserSummary, onClick: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                BodyMediumText(
-                    text = "${user.gender}"
-                )
+                BodyMediumText(text = user.job)
 
                 BodyMediumText(
                     modifier = Modifier.widthIn(30.dp),
-                    text = "Iran",
+                    text = user.country ?: stringResource(id = R.string.country),
                     icon = R.drawable.ic_location,
                     iconGravity = ProcoGravity.Left
                 )
@@ -124,12 +123,12 @@ fun MentorItem(user: UserSummary, onClick: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 BodyMediumText(
-                    text = "#kotlin #Java #Jetpack-compose"
+                    text = user.skills?.map { "#${it.name}" }?.joinToString(" ") ?: ""
                 )
 
                 BodyMediumText(
                     modifier = Modifier.widthIn(30.dp),
-                    text = "5",
+                    text = "${user.cost} $",
                     icon = R.drawable.ic_dollar,
                     iconGravity = ProcoGravity.Left
                 )

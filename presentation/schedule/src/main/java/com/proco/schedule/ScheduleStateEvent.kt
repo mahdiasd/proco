@@ -24,10 +24,12 @@ data class ScheduleUiState(
     val saveCostLoading: Boolean? = null,
     val saveScheduleLoading: Boolean? = null,
     val isSaved: Boolean = false,
+    val showRetryGetSchedule: Boolean = false
 ) : BaseUiState<ImmutableList<Schedule>>
 
 sealed class ScheduleUiEvent : UiEvent {
     data object OnSchedule : ScheduleUiEvent()
+    data object OnRetry : ScheduleUiEvent()
     data class OnAddHour(val date: Instant, val hourRange: HourRange) : ScheduleUiEvent()
     data class OnUpdateCost(val price: Int) : ScheduleUiEvent()
     data class OnRemoveHour(val date: Instant, val hourRange: HourRange) : ScheduleUiEvent()

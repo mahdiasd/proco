@@ -14,7 +14,6 @@ import com.proco.login.navigation.loginScreen
 import com.proco.register.navigation.registerRoute
 import com.proco.register.navigation.registerScreen
 import com.proco.schedule.navigation.ScheduleScreenCompose
-import com.proco.schedule.navigation.scheduleRoute
 import com.proco.schedule.navigation.scheduleScreen
 import com.proco.search.navigation.SearchScreenCompose
 import com.proco.search.navigation.searchScreen
@@ -42,7 +41,7 @@ fun AppNavigation() {
         )
 
         registerScreen(onRegister = {
-            navController.navigate(scheduleRoute)
+            navController.navigate(mainRoute)
         })
 
 
@@ -53,11 +52,17 @@ fun AppNavigation() {
             scheduleScreen = { ScheduleScreenCompose() },
             bookingScreen = {},
             invoiceScreen = {},
+            navigateToLogin = {
+                navController.navigate(loginRoute)
+                navController.popBackStack(loginRoute, false)
+            }
         )
 
         filterScreen(onPopupBackStack = { navController.popBackStack() })
 
-        searchScreen(onUserClick = {}, onFilter = {}, userFilter = FakeData.filter())
+        searchScreen(onUserClick = {}, onFilter = { navController.navigate(filterRoute) }, userFilter = FakeData.filter())
+
+        filterScreen { navController.popBackStack() }
 
         scheduleScreen()
     }

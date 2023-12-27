@@ -38,9 +38,9 @@ object FakeData {
                 email = "Raheem",
                 type = UserType.Mentee,
                 cost = 5457,
-                job = Job(id = 9665, name = "Android Developer", expertises = expertises()),
+                job = "",
                 country = null,
-                expertise = expertises(),
+                expertises = expertises(),
                 skills = null
             )
         ).toMutableList()
@@ -48,19 +48,22 @@ object FakeData {
 
     fun user(): User {
         return User(
-            id = 0,
-            name = "Mahdi",
-            family = "Asadollahpour",
+            id = 6448,
+            name = "Carlin",
+            family = "Tyanna",
+            email = "Anabel",
             type = UserType.Mentee,
-            avatar = "",
-            job = Job(name = "", expertises = expertises()),
-            expertise = Expertise(0, name = "Android Developer"),
-            experience = 0,
-            company = "",
-            skills = listOf(Skill(name = "#android")).toImmutableList(),
-            bio = "Experienced Android developer with over 5 years building and deploying apps to the Google Play Store. Skilled in Java, Kotlin, XML, Firebase, REST APIs, SQLite databases, and Material Design. Passionate about turning ideas into performant, beautiful mobile apps that delight users. Built messaging, weather, sports, and location-based apps each with over 100k downloads. Excited to join a fast-paced team to continue creating meaningful impacts in people's lives through mobile technology. Constantly learning and staying on top of latest Android advancements.",
-            country = Country(code = "IR", name = "Iran"),
-            price = null
+            avatar = "Lexi",
+            gender = Gender.Male,
+            job = "Temika",
+            experience = 4375,
+            company = "Charline",
+            education = "Latoria",
+            skills = null,
+            expertises = null,
+            bio = null,
+            cost = 351,
+            country = "Arielle"
         )
     }
 

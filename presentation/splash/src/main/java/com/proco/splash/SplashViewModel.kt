@@ -2,7 +2,6 @@ package app.ir.splash
 
 import androidx.lifecycle.viewModelScope
 import com.proco.base.BaseViewModel
-import com.proco.base.UiMessage
 import com.proco.domain.model.network.DataResult
 import com.proco.domain.usecase.user.GetLocalUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +27,7 @@ class SplashViewModel @Inject constructor(private val getLocalUserUseCase: GetLo
                     }
 
                     is DataResult.Failure -> {
-                        setState { currentState.copy(uiMessage = UiMessage.Network(it.networkError)) }
+                        setState { currentState.copy(isLoggedIn = false) }
                     }
                 }
             }
@@ -39,7 +38,7 @@ class SplashViewModel @Inject constructor(private val getLocalUserUseCase: GetLo
         viewModelScope.launch {
             setState { currentState.copy(isLoading = true) }
             delay(1000)
-            setState { currentState.copy(isLoading = false, updateState = UpdateState.NoUpdate) }
+            setState { currentState.copy(updateState = UpdateState.NoUpdate, isLoading = false) }
         }
     }
 

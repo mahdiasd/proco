@@ -73,5 +73,7 @@
     <string name="fake_bio">"Experienced Android developer with over 5 years building and deploying apps to the Google Play Store. Skilled in Java, Kotlin, XML, Firebase, REST APIs, SQLite databases, and Material Design. Passionate about turning ideas into performant, beautiful mobile apps that delight users. Built messaging, weather, sports, and location-based apps each with over 100k downloads. Excited to join a fast-paced team to continue creating meaningful impacts in people's lives through mobile technology. Constantly learning and staying on top of latest Android advancements."</string>
     <string name="failed_splash">Can`t get some need parameters</string>
 
+    <string name="schedule_not_fetch">Scheduling not fetch from server</string>
+
 
 </resources>

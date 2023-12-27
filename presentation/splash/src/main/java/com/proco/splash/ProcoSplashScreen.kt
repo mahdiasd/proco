@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -19,7 +20,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import app.ir.splash.SplashViewModel
 import app.ir.splash.UpdateState
 import com.proco.base.BaseScreen
-import com.proco.extention.baseModifier
 import com.proco.theme.ProcoTheme
 import com.proco.theme.white
 import com.proco.ui.R
@@ -28,12 +28,14 @@ import com.proco.ui.text.BodyMediumText
 import com.proco.ui.text.TitleLargeText
 
 
-@Preview(showSystemUi = true)
+@Preview(showBackground = true)
 @Composable
 private fun Preview(isLoading: Boolean = false) {
     ProcoTheme {
         BaseScreen(
-            modifier = Modifier.baseModifier(),
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.primary)
+                .padding(16.dp),
             uiMessage = null
         ) {
             SplashScreenContent(false)
@@ -41,7 +43,7 @@ private fun Preview(isLoading: Boolean = false) {
     }
 }
 
-@Preview(showSystemUi = true)
+@Preview(showBackground = true)
 @Composable
 private fun LoadingPreview() = Preview(isLoading = true)
 
@@ -52,12 +54,17 @@ fun ProcoSplashScreen(
     vm: SplashViewModel = hiltViewModel()
 ) {
     val uiState = vm.uiState.collectAsState().value
-    BaseScreen(modifier = Modifier.fillMaxSize(), uiMessage = uiState.uiMessage) {
-        SplashScreenContent(uiState.isLoading)
+    BaseScreen(
+        modifier = Modifier.fillMaxSize(),
+        uiMessage = uiState.uiMessage
+    ) {
     }
 
     when (uiState.updateState) {
-        UpdateState.Idle -> {}
+        UpdateState.Idle -> {
+            SplashScreenContent(isLoading = uiState.isLoading)
+        }
+
         UpdateState.NoUpdate -> {
             if (uiState.isLoggedIn) navigateToHome()
             else navigateToLogin()
@@ -86,6 +93,7 @@ private fun SplashScreenContent(isLoading: Boolean) {
         if (isLoading) {
             LoadingScreen(color = white)
         } else {
+
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,

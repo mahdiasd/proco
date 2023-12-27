@@ -2,8 +2,7 @@ package app.ir.main
 
 import androidx.lifecycle.viewModelScope
 import com.proco.base.BaseViewModel
-import com.proco.domain.fake_data.FakeData
-import com.proco.domain.model.user.UserType
+import com.proco.domain.model.network.DataResult
 import com.proco.domain.usecase.user.GetLocalUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -11,7 +10,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val getUseCase: GetLocalUserUseCase,
+    private val getLocalUserUseCase: GetLocalUserUseCase,
 ) : BaseViewModel<MainUiState, MainUiEvent>() {
 
     init {
@@ -21,10 +20,16 @@ class MainViewModel @Inject constructor(
 
     private fun getUser() {
         viewModelScope.launch {
-            getUseCase.executeSync(Unit).collect {
-//                setState { currentState.copy(user = it) }
-                // TODO: replaced real data with this line
-                setState { currentState.copy(user = FakeData.user().copy(type = UserType.Mentor)) }
+            getLocalUserUseCase.executeSync(Unit).collect {
+                when (it) {
+                    is DataResult.Failure -> {
+                        setState { currentState.copy(userNotFound = true) }
+                    }
+
+                    is DataResult.Success -> {
+                        setState { currentState.copy(user = it.data) }
+                    }
+                }
             }
         }
     }

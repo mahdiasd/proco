@@ -34,7 +34,6 @@ class NetworkModule {
     @Singleton
     @Provides
     fun getToken(tokenDataStore: TokenDataStore): String {
-        tokenDataStore.readToken().dLog("Token: ")
         return tokenDataStore.readToken()
     }
 
