@@ -6,7 +6,9 @@ import androidx.navigation.compose.rememberNavController
 import app.ir.main.navigation.mainRoute
 import app.ir.main.navigation.mainScreen
 import app.ir.profile.navigation.ProfileScreenCompose
-import com.proco.domain.fake_data.FakeData
+import app.ir.profile.navigation.navigateToProfile
+import app.ir.profile.navigation.profileRoute
+import app.ir.profile.navigation.profileScreen
 import com.proco.filter.navigation.filterRoute
 import com.proco.filter.navigation.filterScreen
 import com.proco.login.navigation.loginRoute
@@ -23,12 +25,25 @@ import com.proco.splash.navigation.splashScreen
 
 @Composable
 fun AppNavigation() {
-
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = splashRoute) {
+
         splashScreen(
-            navigateToHome = { navController.navigate(mainRoute) },
-            navigateToLogin = { navController.navigate(loginRoute) }
+            navigateToHome = {
+                navController.navigate(mainRoute)
+                {
+                    popUpTo(splashRoute) {
+                        this.inclusive = true
+                    }
+                }
+            },
+            navigateToLogin = {
+                navController.navigate(loginRoute) {
+                    popUpTo(splashRoute) {
+                        this.inclusive = true
+                    }
+                }
+            }
         )
 
         loginScreen(
@@ -44,10 +59,8 @@ fun AppNavigation() {
             navController.navigate(mainRoute)
         })
 
-
-
         mainScreen(
-            searchScreen = { SearchScreenCompose(onUserClick = {}, onFilter = { navController.navigate(filterRoute) }) },
+            searchScreen = { SearchScreenCompose(onUserClick = { userId -> navController.navigateToProfile(userId) }, onFilter = { navController.navigate(filterRoute) }) },
             profileScreen = { ProfileScreenCompose(onBooking = {}, onEdit = {}) },
             scheduleScreen = { ScheduleScreenCompose() },
             bookingScreen = {},
@@ -60,11 +73,17 @@ fun AppNavigation() {
 
         filterScreen(onPopupBackStack = { navController.popBackStack() })
 
-        searchScreen(onUserClick = {}, onFilter = { navController.navigate(filterRoute) }, userFilter = FakeData.filter())
+        searchScreen(
+            onUserClick = {
+                navController.navigate(profileRoute + "/${it}")
+            },
+            onFilter = { navController.navigate(filterRoute) }
+        )
+
+        profileScreen(onBooking = {}, onEdit = {})
 
         filterScreen { navController.popBackStack() }
 
         scheduleScreen()
     }
-
 }

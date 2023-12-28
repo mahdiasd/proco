@@ -46,11 +46,24 @@ android {
 dependencies {
     implementation(project(":domain"))
     implementation(project(":common:ui"))
+    implementation(libs.androidx.junit.ktx)
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     /* --- Hilt ---*/
+    androidTestImplementation (libs.androidx.navigation.testing)
+
     implementation(libs.dagger.hilt.android)
     implementation(libs.dagger.hilt.navigation)
     ksp(libs.dagger.hilt.compiler)
+
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.ui.test.junit4)
+    androidTestImplementation (libs.androidx.navigation.testing)
+    debugImplementation(libs.ui.tooling)
+    debugImplementation(libs.ui.test.manifest)
+    implementation(libs.androidx.junit.ktx)
 }

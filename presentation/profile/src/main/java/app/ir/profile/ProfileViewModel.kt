@@ -18,15 +18,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle?,
+
     private val getOnlineUserUseCase: GetOnlineUserUseCase,
     private val getLocalUserUseCase: GetLocalUserUseCase,
     private val updatePriceUseCase: UpdatePriceUseCase,
-    private val savedStateHandle: SavedStateHandle?,
     private val getScheduleUseCase: GetScheduleUseCase
+
 ) : BaseViewModel<ProfileViewState, ProfileViewEvent>() {
     private var userId: Int? = null
 
     init {
+        manageProfileType()
         when (currentState.profileType) {
             is ProfileType.Public -> {
                 getOnlineUser()
@@ -35,6 +38,11 @@ class ProfileViewModel @Inject constructor(
 
             is ProfileType.Self -> getLocalUser()
         }
+    }
+
+    private fun manageProfileType() {
+        userId = savedStateHandle?.get("id")
+        setState { currentState.copy(profileType = if (userId == null) ProfileType.Self else ProfileType.Public) }
     }
 
     private fun getSchedule() {
@@ -59,7 +67,6 @@ class ProfileViewModel @Inject constructor(
             }
         }
     }
-
 
     private fun getLocalUser() {
         viewModelScope.launch {
@@ -114,10 +121,7 @@ class ProfileViewModel @Inject constructor(
     }
 
 
-    override fun createInitialState(): ProfileViewState {
-        userId = savedStateHandle?.get("id")
-        return ProfileViewState(profileType = if (userId == null) ProfileType.Self else ProfileType.Public)
-    }
+    override fun createInitialState() = ProfileViewState()
 
     override fun onTriggerEvent(event: ProfileViewEvent) {
         when (event) {

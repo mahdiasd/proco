@@ -14,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,11 +22,10 @@ import app.ir.splash.SplashViewModel
 import app.ir.splash.UpdateState
 import com.proco.base.BaseScreen
 import com.proco.theme.ProcoTheme
-import com.proco.theme.white
 import com.proco.ui.R
-import com.proco.ui.loading.LoadingScreen
+import com.proco.ui.lottie_animation.LottieLoader
 import com.proco.ui.text.BodyMediumText
-import com.proco.ui.text.TitleLargeText
+import com.proco.ui.text.HeadLargeText
 
 
 @Preview(showBackground = true)
@@ -81,27 +81,35 @@ private fun SplashScreenContent(isLoading: Boolean) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.colorScheme.background)
             .safeContentPadding()
             .navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            HeadLargeText(text = stringResource(R.string.app_name))
+            BodyMediumText(text = stringResource(R.string.splash_text), textAlign = TextAlign.Center)
+        }
 
-        TitleLargeText(text = stringResource(R.string.app_name), color = white)
+        LottieLoader(modifier = Modifier.fillMaxSize())
 
-        if (isLoading) {
-            LoadingScreen(color = white)
-        } else {
-
+        if (!isLoading) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                BodyMediumText(text = stringResource(R.string.failed_splash), color = white)
-                BodyMediumText(text = stringResource(R.string.try_again), color = white)
+                BodyMediumText(text = stringResource(R.string.failed_splash))
+                BodyMediumText(text = stringResource(R.string.try_again))
             }
+
         }
     }
 }

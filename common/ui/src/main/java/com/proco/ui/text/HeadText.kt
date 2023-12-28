@@ -20,11 +20,15 @@ private fun Prev() {
 fun HeadLargeText(
     modifier: Modifier = Modifier,
     text: String,
-    textStyle: TextStyle = MaterialTheme.typography.headlineLarge.withColor(MaterialTheme.colorScheme.primary).copy(textAlign = TextAlign.Center),
+    textStyle: TextStyle = MaterialTheme.typography.headlineLarge,
+    color: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary,
+    textAlign: TextAlign = TextAlign.Center,
     maxLines: Int = 1,
 ) {
-    Text(modifier = modifier, text = text, style = textStyle, maxLines = maxLines)
-}@Composable
+    Text(modifier = modifier, text = text, style = textStyle.withColor(color).copy(textAlign = textAlign), maxLines = maxLines)
+}
+
+@Composable
 fun HeadMediumText(
     modifier: Modifier = Modifier,
     text: String,

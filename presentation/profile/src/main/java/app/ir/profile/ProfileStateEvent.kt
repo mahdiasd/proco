@@ -13,7 +13,7 @@ data class ProfileViewState(
     override val isLoading: Boolean = true,
     override val data: User? = null,
     override val uiMessage: UiMessage? = null,
-    val profileType: ProfileType,
+    val profileType: ProfileType = ProfileType.Self,
     val schedule: ImmutableList<Schedule>? = null,
     val showRetryGetSchedule: Boolean = false,
     val savePriceLoading: Boolean? = null,

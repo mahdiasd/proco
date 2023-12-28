@@ -68,6 +68,7 @@ dependencies {
 
     api(libs.accompanist.swiperefresh)
 
+    api("com.airbnb.android:lottie-compose:6.2.0")
     /*--------------------- Tests -------------------------------*/
     testApi(libs.mockito.kotlin)
     testApi(libs.kotlinx.coroutines.test)

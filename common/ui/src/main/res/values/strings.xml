@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Proco</string>
+    <string name="splash_text">Unlock your potential with 1-on-1 mentorship and guidance.</string>
 
     <string name="home">Home</string>
 

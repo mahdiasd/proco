@@ -6,7 +6,6 @@ import com.proco.base.UiMessage
 import com.proco.domain.model.network.DataResult
 import com.proco.domain.usecase.GetMentorListUseCase
 import com.proco.domain.usecase.filter.GetUserFilterUseCase
-import com.proco.extention.dLog
 import com.proco.utils.MyConstant
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
@@ -54,7 +53,6 @@ class SearchViewModel @Inject constructor(
     private fun getUserFilter() {
         viewModelScope.launch {
             getUserFilterUseCase.executeSync(Unit).collect {
-                it.dLog("userFilter: ")
                 setState { currentState.copy(userFilter = it, page = MyConstant.defaultPageNumber) }
                 getUsers()
             }

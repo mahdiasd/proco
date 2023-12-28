@@ -37,6 +37,7 @@ import com.proco.extention.baseModifier
 import com.proco.extention.blackOrWhite
 import com.proco.extention.coloredShadow
 import com.proco.theme.ProcoTheme
+import com.proco.theme.white
 import com.proco.ui.R
 import com.proco.ui.list.SwipeList
 import com.proco.ui.text.LabelMediumText
@@ -70,7 +71,7 @@ private fun DarkPreview() {
 @Composable
 fun SearchScreen(
     vm: SearchViewModel = hiltViewModel(),
-    onItemClick: () -> Unit,
+    onItemClick: (Int) -> Unit,
     onFilter: () -> Unit,
 ) {
     val uiState = vm.uiState.collectAsState().value
@@ -108,7 +109,7 @@ private fun SearchScreenContent(
     onRefresh: () -> Unit = {},
     onLoadMore: () -> Unit = {},
     onFilter: () -> Unit,
-    onItemClick: () -> Unit
+    onItemClick: (Int) -> Unit
 ) {
     val filterCount by remember(userFilter) { derivedStateOf { userFilter?.getCount() } }
 
@@ -156,7 +157,8 @@ private fun SearchScreenContent(
                         LabelMediumText(
                             modifier = Modifier,
                             text = "$filterCount",
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            color = white
                         )
                     }
                 },
@@ -185,7 +187,9 @@ private fun SearchScreenContent(
             onLoadMore = onLoadMore,
         ) { index ->
             if (users != null)
-                MentorItem(users[index], onClick = onItemClick)
+                MentorItem(users[index], onClick = {
+                    onItemClick(users[index].id)
+                })
         }
     }
 }
